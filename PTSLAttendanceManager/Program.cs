@@ -1,5 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using PTSLAttendanceManager.Data;
 using System.Text;
@@ -19,13 +21,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = false, // Skip issuer validation
+            ValidateAudience = false, // Skip audience validation
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ca4e3bf2fd397790835c319a5b506b130cc0383d8e53028c63c61098681d3093")) // Replace with your secret key
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Set the key from configuration
         };
     });
+
+// Add services to the container, such as controllers and other services
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -40,8 +45,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication(); // Enable authentication middleware
+app.UseAuthorization();  // Enable authorization middleware
 
 app.MapControllerRoute(
     name: "default",

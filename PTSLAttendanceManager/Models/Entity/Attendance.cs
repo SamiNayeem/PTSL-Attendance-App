@@ -12,19 +12,22 @@ namespace PTSLAttendanceManager.Models.Entity
         public required DateTime Date { get; set; }
 
         // Foreign key property for Users
-        public required string UserId { get; set; }  
+        public required string UserId { get; set; }
 
         // Navigation property with ForeignKey attribute
         [ForeignKey(nameof(UserId))]
         public required Users Users { get; set; }
 
         public required DateTime CheckIn { get; set; }
-        public required DateTime CheckOut { get; set; }
+
+        // Make CheckOut nullable to allow setting it later during check-out
+        public DateTime? CheckOut { get; set; } = null;
 
         public bool IsActive { get; set; } = true;
 
         public required double Latitude { get; set; }
-        public required double Longitude { get; set; }  // Fixed spelling from `Logitude` to `Longitude`
+
+        public required double Longitude { get; set; }  // Corrected spelling for Longitude
 
         public void Deactivate()
         {
