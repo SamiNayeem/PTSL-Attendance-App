@@ -17,11 +17,13 @@ namespace PTSLAttendanceManager.Data
         public DbSet<Users> Users { get; set; }
 
         public DbSet<Attendance> Attendance { get; set; }
-        public DbSet<OtherAttendance> OtherAttendances { get; set; }
+        public DbSet<OtherAttendance> OtherAttendance { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
 
         public DbSet<UserConfigDto> UserConfigDtos { get; set; }
+
+        
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
