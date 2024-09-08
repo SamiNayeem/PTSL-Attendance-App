@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PTSLAttendanceManager.Data;
 
@@ -11,9 +12,11 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908073706_initial1.4")]
+    partial class initial14
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,9 +289,6 @@ namespace PTSLAttendanceManager.Migrations
 
                     b.Property<decimal>("OfficeLongitude")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<long>("OfficeRadius")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Phone")
                         .IsRequired()

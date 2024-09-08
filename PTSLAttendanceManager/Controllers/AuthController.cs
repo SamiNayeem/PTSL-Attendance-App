@@ -33,9 +33,18 @@ namespace PTSLAttendanceManager.Controllers
             }
 
             
-            var otp = "123456"; 
+            var otp = "123456";
 
-            return Ok(new { statusCode = 200, message = "Login successful", otp = otp });
+            //return Ok(new { statusCode = 200, message = "Login successful", otp = otp });
+            return Ok(new
+            {
+                statusCode = 200,
+                message = "Login Successful",
+                data = new
+                {
+                    otp = otp
+                }
+            });
         }
 
         [HttpPost("VerifyOtp")]
@@ -66,7 +75,16 @@ namespace PTSLAttendanceManager.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { statusCode = 200, message = "OTP verified successfully", token = tokenString });
+            //return Ok(new { statusCode = 200, message = "OTP verified successfully", token = tokenString });
+            return Ok(new
+            {
+                statusCode = 200,
+                message = "OTP Verified",
+                data = new
+                {
+                    token = tokenString
+                }
+            });
         }
     }
 
