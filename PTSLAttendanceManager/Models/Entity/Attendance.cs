@@ -19,10 +19,11 @@ namespace PTSLAttendanceManager.Models.Entity
         public required Users Users { get; set; }
 
         public required DateTime CheckIn { get; set; }
+        public required bool IsCheckedIn { get; set; } = false;
 
         // Make CheckOut nullable to allow setting it later during check-out
         public DateTime? CheckOut { get; set; } = null;
-
+        public required bool IsCheckedOut { get; set; } = false;
         public bool IsActive { get; set; } = true;
 
         public required double Latitude { get; set; }

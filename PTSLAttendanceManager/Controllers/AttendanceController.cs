@@ -56,6 +56,8 @@ namespace PTSLAttendanceManager.Controllers
                 Users = user,
                 Date = DateTime.Now.Date,
                 CheckIn = DateTime.Now,
+                IsCheckedIn = true,
+                IsCheckedOut = false,
                 Latitude = request.Latitude,
                 Longitude = request.Longitude,
                 IsActive = true

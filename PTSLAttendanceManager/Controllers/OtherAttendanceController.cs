@@ -44,6 +44,8 @@ namespace PTSLAttendanceManager.Controllers
                 Users = user,  // Set the Users navigation property
                 Date = DateTime.Now.Date,
                 CheckIn = DateTime.Now,  // Assuming CheckIn time is now
+                IsCheckedIn = true,
+                IsCheckedOut = false,
                 Latitude = request.Latitude,
                 Longitude = request.Longitude,
                 IsActive = true
@@ -52,16 +54,16 @@ namespace PTSLAttendanceManager.Controllers
             _context.Attendance.Add(attendance);
             await _context.SaveChangesAsync();
 
-            // Create a new other attendance record linked to the created attendance
+            
             var otherAttendance = new OtherAttendance
             {
-                AttendanceId = attendance.Id,  // Link to the newly created attendance record
-                Attendance = attendance,  // Set the Attendance navigation property
+                AttendanceId = attendance.Id,  
+                Attendance = attendance,  
                 Image = request.Image,
                 Title = request.Title,
                 Description = request.Description,
                 Latitude = request.Latitude,
-                Logitude = request.Longitude // Ensure correct spelling
+                Logitude = request.Longitude 
             };
 
             _context.OtherAttendance.Add(otherAttendance);
@@ -114,12 +116,11 @@ namespace PTSLAttendanceManager.Controllers
 
             // Update the checkout time in the attendance record
             attendance.CheckOut = DateTime.Now;
-            attendance.IsActive = false; // Mark as inactive
+            attendance.IsActive = false; 
 
             _context.Attendance.Update(attendance);
 
-            // Optionally, you can update otherAttendance if needed
-            // otherAttendance.CheckOut = DateTime.Now; // if you need to update the checkout time in otherAttendance
+           
             otherAttendance.IsActive = false; // Mark as inactive if needed
 
             _context.OtherAttendance.Update(otherAttendance);
