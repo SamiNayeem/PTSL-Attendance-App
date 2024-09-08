@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
@@ -19,10 +21,20 @@ namespace PTSLAttendanceManager.Controllers
         }
 
         [HttpPost("GetUserConfig")]
-        public async Task<IActionResult> GetUserConfig([FromBody] PtslIdRequest body)
+        public async Task<IActionResult> GetUserConfig()
         {
-            // Extract PtslId from the JSON request body
-            string PtslId = body.PtslId;
+            // Retrieve the PtslId from the JWT token claims
+            var PtslId = User.FindFirst("PtslId")?.Value;
+
+            if (PtslId == null)
+            {
+                return Unauthorized(new
+                {
+                    statusCode = 401,
+                    message = "Invalid token",
+                    data = new object() { }
+                });
+            }
 
             var ptslIdParam = new SqlParameter("@PtslId", PtslId);
 
@@ -37,7 +49,7 @@ namespace PTSLAttendanceManager.Controllers
                 {
                     statusCode = 404,
                     message = "User not found",
-                    data = new List<object>()
+                    data = new object() { }
                 });
             }
 

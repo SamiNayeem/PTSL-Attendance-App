@@ -28,7 +28,7 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new { statusCode = 401, message = "Invalid token", data = (object)null });
             }
 
-            var user = await _context.Users.Include(u => u.Offices) // Make sure to include the user's Office
+            var user = await _context.Users.Include(u => u.Offices) 
                 .FirstOrDefaultAsync(u => u.PtslId == ptslId);
 
             if (user == null)

@@ -14,7 +14,7 @@ namespace PTSLAttendanceManager.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly string _secretKey = "ca4e3bf2fd397790835c319a5b506b130cc0383d8e53028c63c61098681d3093"; // Replace with your actual secret key
+        private readonly string _secretKey = "ca4e3bf2fd397790835c319a5b506b130cc0383d8e53028c63c61098681d3093"; 
 
         public AuthController(ApplicationDbContext context)
         {
@@ -24,7 +24,7 @@ namespace PTSLAttendanceManager.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // Validate the PtslId
+            
             var user = await _context.Users.FirstOrDefaultAsync(u => u.PtslId == request.PtslId);
 
             if (user == null)
@@ -32,9 +32,8 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new { statusCode = 401, message = "Invalid PtslId" });
             }
 
-            // Generate and return OTP
-            var otp = "123456"; // Fixed OTP value for testing
-                                // In a real-world application, you'd send this OTP to the user via SMS/email/etc.
+            
+            var otp = "123456"; 
 
             return Ok(new { statusCode = 200, message = "Login successful", otp = otp });
         }
@@ -42,13 +41,13 @@ namespace PTSLAttendanceManager.Controllers
         [HttpPost("VerifyOtp")]
         public IActionResult VerifyOtp([FromBody] VerifyOtpRequest request)
         {
-            // Here, you need to validate the OTP. For example:
-            if (request.Otp != "123456") // Check if OTP is valid
+            
+            if (request.Otp != "123456") 
             {
                 return Unauthorized(new { statusCode = 401, message = "Invalid OTP" });
             }
 
-            // If OTP is valid, generate JWT token
+            
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_secretKey);
 
@@ -57,13 +56,11 @@ namespace PTSLAttendanceManager.Controllers
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, request.PtslId),
-                    new Claim("PtslId", request.PtslId) // Include PtslId in claims
+                    new Claim("PtslId", request.PtslId) 
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                // Optionally, add issuer and audience
-                // Issuer = "your_issuer",
-                // Audience = "your_audience"
+                
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
