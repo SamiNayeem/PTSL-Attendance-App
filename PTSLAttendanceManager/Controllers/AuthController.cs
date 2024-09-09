@@ -67,7 +67,7 @@ namespace PTSLAttendanceManager.Controllers
                     new Claim(JwtRegisteredClaimNames.Sub, request.PtslId),
                     new Claim("PtslId", request.PtslId) 
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 
             };

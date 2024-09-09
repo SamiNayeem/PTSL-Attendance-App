@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models.Entity;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -44,24 +43,25 @@ namespace PTSLAttendanceManager.Controllers
                 return BadRequest(new { statusCode = 400, message = "User's office not found or inactive", data = (object)null });
             }
 
-            // Find today's latest attendance record
-            var latestAttendance = await _context.Attendance
-                .Where(a => a.UserId == ptslId && a.Date == DateTime.Today)
-                .OrderByDescending(a => a.CheckIn)
-                .FirstOrDefaultAsync();
-
             // Calculate if the user is within the office radius
-            double distance = CalculateDistance(office.Latitude, office.Logitude, request.Latitude, request.Longitude);
+            double distance = CalculateDistance(office.Latitude, office.Longitude, request.Latitude, request.Longitude);
             bool isOnLocation = distance <= office.Radius;
 
-            if (latestAttendance == null || latestAttendance.IsCheckedOut)
+            if (request.IsOnLocation && !isOnLocation)
             {
-                // Handle Check-In
+                return BadRequest(new { statusCode = 400, message = "You are outside the location radius.", data = (object)null });
+            }
+
+            // Check if user is checking in or out based on IsCheckedIn flag
+            if (request.IsCheckedIn == 0)
+            {
+                
                 var newAttendance = new Attendance
                 {
                     UserId = ptslId,
                     Users = user,
                     Date = DateTime.Now.Date,
+                    IsOnLocation = isOnLocation,
                     CheckIn = DateTime.Now,
                     IsCheckedIn = true,
                     IsCheckedOut = false,
@@ -83,7 +83,7 @@ namespace PTSLAttendanceManager.Controllers
                         Title = request.Title ?? "Attended from other place",
                         Description = request.Description,
                         Latitude = request.Latitude,
-                        Logitude = request.Longitude,
+                        Longitude = request.Longitude,
                         IsActive = true
                     };
 
@@ -92,7 +92,6 @@ namespace PTSLAttendanceManager.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Returning the response in the requested format for check-in
                 return Ok(new
                 {
                     statusCode = 200,
@@ -108,8 +107,19 @@ namespace PTSLAttendanceManager.Controllers
                     }
                 });
             }
-            else if (latestAttendance.IsCheckedIn && !latestAttendance.IsCheckedOut)
+            else if (request.IsCheckedIn == 1)
             {
+                // Find today's latest attendance record
+                var latestAttendance = await _context.Attendance
+                    .Where(a => a.UserId == ptslId && a.Date == DateTime.Today && a.IsCheckedIn && !a.IsCheckedOut)
+                    .OrderByDescending(a => a.CheckIn)
+                    .FirstOrDefaultAsync();
+
+                if (latestAttendance == null)
+                {
+                    return BadRequest(new { statusCode = 400, message = "No active check-in found for checkout.", data = (object)null });
+                }
+
                 // Handle Check-Out
                 latestAttendance.CheckOut = DateTime.Now;
                 latestAttendance.IsCheckedOut = true;
@@ -117,7 +127,6 @@ namespace PTSLAttendanceManager.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Returning the response in the requested format for check-out
                 return Ok(new
                 {
                     statusCode = 200,
@@ -135,11 +144,9 @@ namespace PTSLAttendanceManager.Controllers
             }
             else
             {
-                return BadRequest(new { statusCode = 400, message = "Cannot check in again without checking out first.", data = (object)null });
+                return BadRequest(new { statusCode = 400, message = "Invalid IsCheckedIn value.", data = (object)null });
             }
         }
-
-
 
         // Helper method to calculate distance between two lat/long points
         private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
@@ -167,6 +174,7 @@ namespace PTSLAttendanceManager.Controllers
         public string? Description { get; set; }
         public required double Latitude { get; set; }
         public required double Longitude { get; set; }
+        public required bool IsOnLocation { get; set; } 
+        public required int IsCheckedIn { get; set; }  
     }
 }
-

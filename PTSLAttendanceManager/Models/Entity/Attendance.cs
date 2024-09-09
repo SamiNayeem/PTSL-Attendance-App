@@ -18,6 +18,7 @@ namespace PTSLAttendanceManager.Models.Entity
         [ForeignKey(nameof(UserId))]
         public required Users Users { get; set; }
 
+        public required bool IsOnLocation { get; set; }
         public required DateTime CheckIn { get; set; }
         public required bool IsCheckedIn { get; set; } = false;
 

@@ -23,7 +23,7 @@ namespace PTSLAttendanceManager.Models.Entity
         public bool IsActive { get; set; } = true;
 
         public required double Latitude { get; set; }
-        public required double Logitude { get; set; }
+        public required double Longitude { get; set; }
 
         public void Deactivate()
         {

@@ -11,7 +11,7 @@ namespace PTSLAttendanceManager.Models.Entity
         public required string Name { get; set; }
         public required string Address { get; set; }
         public required double Latitude { get; set; }
-        public required double Logitude { get; set; }
+        public required double Longitude { get; set; }
         public long Radius { get; set; }
         public bool IsActive { get; set; } = true;
 

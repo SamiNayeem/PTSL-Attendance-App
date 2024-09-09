@@ -31,10 +31,14 @@ namespace PTSLAttendanceManager.Models.Entity
         [ForeignKey(nameof(RoleId))]
         public Roles? Roles { get; set; }
 
-        public long TeamId { get; set; }
+        public long? TeamId { get; set; }
 
         [ForeignKey(nameof(TeamId))]
         public Teams? Teams { get; set; }
+
+
+        public long UserType { get; set; }
+
 
         public bool IsActive { get; set; } = true;
 

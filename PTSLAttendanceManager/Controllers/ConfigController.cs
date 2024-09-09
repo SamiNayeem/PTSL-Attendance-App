@@ -38,7 +38,7 @@ namespace PTSLAttendanceManager.Controllers
 
             var ptslIdParam = new SqlParameter("@PtslId", PtslId);
 
-            // Call the stored procedure
+            
             var result = await _context.UserConfigDtos
                 .FromSqlRaw("EXEC Config @PtslId", ptslIdParam)
                 .ToListAsync();

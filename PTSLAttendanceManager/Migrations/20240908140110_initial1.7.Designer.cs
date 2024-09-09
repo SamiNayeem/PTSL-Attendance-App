@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PTSLAttendanceManager.Data;
 
@@ -11,9 +12,11 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908140110_initial1.7")]
+    partial class initial17
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,9 +49,6 @@ namespace PTSLAttendanceManager.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsCheckedOut")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOnLocation")
                         .HasColumnType("bit");
 
                     b.Property<double>("Latitude")
@@ -113,7 +113,7 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
 
-                    b.Property<double>("Longitude")
+                    b.Property<double>("Logitude")
                         .HasColumnType("float");
 
                     b.Property<string>("Name")
@@ -247,10 +247,7 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TeamId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserType")
+                    b.Property<long>("TeamId")
                         .HasColumnType("bigint");
 
                     b.HasKey("PtslId");
@@ -359,7 +356,9 @@ namespace PTSLAttendanceManager.Migrations
 
                     b.HasOne("PTSLAttendanceManager.Models.Entity.Teams", "Teams")
                         .WithMany()
-                        .HasForeignKey("TeamId");
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Offices");
 
