@@ -19,64 +19,47 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpPost("GetAttendanceHistory")]
-        
-        public async Task<IActionResult> GetAttendanceHistory([FromBody] AttendanceHistoryRequest request)
+        [HttpPost("GetAttendance")]
+        [Authorize] // Ensure the user is authenticated
+        public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
-            // Retrieve PtslId, RoleId, and TeamId from Bearer Token
             var ptslId = User.FindFirst("PtslId")?.Value;
-            var roleId = User.FindFirst("RoleId")?.Value;
-            var teamId = User.FindFirst("TeamId")?.Value;
+            var roleId = int.Parse(User.FindFirst(ClaimTypes.Role)?.Value ?? "0");
 
-            if (ptslId == null || roleId == null)
+            if (ptslId == null || roleId == 0)
             {
                 return Unauthorized(new { statusCode = 401, message = "Invalid token", data = (object)null });
             }
 
-            // Convert RoleId and TeamId to the appropriate data types
-            int parsedRoleId = int.Parse(roleId);
-            int? parsedTeamId = teamId != null ? int.Parse(teamId) : (int?)null;
+            var teamId = await _context.Users
+                .Where(u => u.PtslId == ptslId)
+                .Select(u => u.TeamId)
+                .FirstOrDefaultAsync();
 
-            // Set null for teamId if role is not 4, otherwise assign PtslId for RoleId 7
-            if (parsedRoleId != 4)
+            if (teamId == 0)
             {
-                parsedTeamId = null;
+                return Unauthorized(new { statusCode = 401, message = "User's team not found", data = (object)null });
             }
 
-            if (parsedRoleId == 7)
-            {
-                request.PtslId = ptslId;
-            }
-
-            // Prepare parameters for stored procedure
-            var parameters = new[]
-            {
-                new SqlParameter("@PtslId", (object)request.PtslId ?? DBNull.Value),
-                new SqlParameter("@TeamId", (object)parsedTeamId ?? DBNull.Value),
-                new SqlParameter("@RoleId", parsedRoleId),
-                new SqlParameter("@Date", (object)request.Date ?? DBNull.Value),
-                new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
-                new SqlParameter("@Year", (object)request.Year ?? DBNull.Value)
-            };
-
-            // Execute the stored procedure
-            var attendanceHistory = await _context.AttendanceHistory
-                .FromSqlRaw("EXEC [dbo].[GetAttendanceHistory] @PtslId, @TeamId, @RoleId, @Date, @Month, @Year", parameters)
+            var result = await _context.AttendanceHistory
+                .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
+                            new SqlParameter("@PtslId", ptslId),
+                            new SqlParameter("@RoleId", roleId),
+                            new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
+                            new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
                 .ToListAsync();
 
             return Ok(new
             {
                 statusCode = 200,
-                message = "Attendance history fetched successfully",
-                data = attendanceHistory
+                message = "Attendance data retrieved successfully",
+                data = result
             });
         }
     }
 
     public class AttendanceHistoryRequest
     {
-        public string? PtslId { get; set; }
-        public DateTime? Date { get; set; } // New Date parameter
         public int? Month { get; set; }
         public int? Year { get; set; }
     }

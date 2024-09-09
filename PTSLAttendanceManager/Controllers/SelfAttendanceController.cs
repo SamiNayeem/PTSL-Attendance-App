@@ -28,12 +28,12 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new { statusCode = 401, message = "Invalid token", data = (object)null });
             }
 
-            // Query the attendance records for the logged-in user
+            
             var attendanceRecords = _context.Attendance
                 .Include(a => a.Users)
                 .Where(a => a.UserId == ptslId);
 
-            // Apply filters if provided in the request
+            
             if (request.Date != null)
             {
                 attendanceRecords = attendanceRecords.Where(a => a.Date.Date == request.Date.Value.Date);
