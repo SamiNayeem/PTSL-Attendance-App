@@ -19,13 +19,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false, // Enforce issuer validation
-            ValidateAudience = false, // Enforce audience validation
-            ValidateLifetime = true, // Validate the expiration and not-before times
-            ValidateIssuerSigningKey = true, // Validate the signature of the token
-            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Define the valid issuer
-            ValidAudience = builder.Configuration["Jwt:Audience"], // Define the valid audience
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Key used to validate the token signature
+            ValidateIssuer = false, 
+            ValidateAudience = false, 
+            ValidateLifetime = true, 
+            ValidateIssuerSigningKey = true, 
+            ValidIssuer = builder.Configuration["Jwt:Issuer"], 
+            ValidAudience = builder.Configuration["Jwt:Audience"], 
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) 
         };
     });
 

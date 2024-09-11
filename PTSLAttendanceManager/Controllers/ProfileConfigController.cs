@@ -11,17 +11,17 @@ namespace PTSLAttendanceManager.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ConfigController : ControllerBase
+    public class ProfileConfigController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public ConfigController(ApplicationDbContext context)
+        public ProfileConfigController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        [HttpPost("GetUserConfig")]
-        public async Task<IActionResult> GetUserConfig()
+        [HttpPost("GetUserProfile")]
+        public async Task<IActionResult> GetProfileConfig()
         {
             // Retrieve the PtslId from the JWT token claims
             var PtslId = User.FindFirst("PtslId")?.Value;
