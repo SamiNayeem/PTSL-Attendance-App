@@ -17,37 +17,36 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpPost("MyAttendance")]
-        public async Task<IActionResult> GetMyAttendanceHistory([FromBody] AttendanceFilterRequest request)
+        [HttpGet("MyAttendance")]
+        public async Task<IActionResult> GetMyAttendanceHistory([FromQuery] AttendanceFilterRequest request)
         {
             // Retrieve PtslId from the bearer token
             var ptslId = User.FindFirst("PtslId")?.Value;
 
-            if (ptslId == null)
+            if (string.IsNullOrEmpty(ptslId))
             {
                 return Unauthorized(new { statusCode = 401, message = "Invalid token", data = (object)null });
             }
 
-            
+            // Initialize query to retrieve attendance records
             var attendanceRecords = _context.Attendance
-                .Include(a => a.Users)
-                .Where(a => a.UserId == ptslId);
+                .Where(a => a.UserId == ptslId);  // Filter by PtslId
 
-            
-            if (request.Date != null)
+            // Apply filters based on request
+            if (request.Date.HasValue)
             {
                 attendanceRecords = attendanceRecords.Where(a => a.Date.Date == request.Date.Value.Date);
             }
-            if (request.Month != null)
+            if (request.Month.HasValue)
             {
                 attendanceRecords = attendanceRecords.Where(a => a.Date.Month == request.Month);
             }
-            if (request.Year != null)
+            if (request.Year.HasValue)
             {
                 attendanceRecords = attendanceRecords.Where(a => a.Date.Year == request.Year);
             }
 
-            // Fetch results
+            // Fetch results and project them to a DTO or anonymous object
             var result = await attendanceRecords
                 .Select(a => new
                 {

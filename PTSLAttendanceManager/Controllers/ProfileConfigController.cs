@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // Correct import for Authorize attribute
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
@@ -20,13 +21,14 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpPost("GetUserProfile")]
+        [HttpGet("GetUserProfile")]
+        [Authorize] // Ensure correct authorization
         public async Task<IActionResult> GetProfileConfig()
         {
             // Retrieve the PtslId from the JWT token claims
-            var PtslId = User.FindFirst("PtslId")?.Value;
+            var ptslId = User.FindFirst("PtslId")?.Value;
 
-            if (PtslId == null)
+            if (string.IsNullOrEmpty(ptslId))
             {
                 return Unauthorized(new
                 {
@@ -36,29 +38,42 @@ namespace PTSLAttendanceManager.Controllers
                 });
             }
 
-            var ptslIdParam = new SqlParameter("@PtslId", PtslId);
+            var ptslIdParam = new SqlParameter("@PtslId", ptslId);
 
-            
-            var result = await _context.UserConfigDtos
-                .FromSqlRaw("EXEC Config @PtslId", ptslIdParam)
-                .ToListAsync();
-
-            if (result == null || result.Count == 0)
+            try
             {
-                return NotFound(new
+                // Execute stored procedure using FromSqlRaw with parameterized query
+                var result = await _context.UserConfigDtos
+                    .FromSqlRaw("EXEC Config @PtslId", ptslIdParam)
+                    .ToListAsync();
+
+                if (!result.Any())
                 {
-                    statusCode = 404,
-                    message = "User not found",
-                    data = new object() { }
+                    return NotFound(new
+                    {
+                        statusCode = 404,
+                        message = "User not found",
+                        data = new object() { }
+                    });
+                }
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    message = "Data retrieved successfully",
+                    data = result
                 });
             }
-
-            return Ok(new
+            catch (Exception ex)
             {
-                statusCode = 200,
-                message = "Data retrieved successfully",
-                data = result
-            });
+                // Catch any exceptions and return an appropriate error response
+                return StatusCode(500, new
+                {
+                    statusCode = 500,
+                    message = "An error occurred while retrieving data.",
+                    error = ex.Message
+                });
+            }
         }
     }
 }

@@ -42,6 +42,8 @@ namespace PTSLAttendanceManager.Models.Entity
 
         public bool IsActive { get; set; } = true;
 
+        public string? SessionInfo { get; set; }
+
         public void Deactivate()
         {
             IsActive = false;

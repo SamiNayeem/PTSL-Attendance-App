@@ -19,18 +19,20 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpPost("GetAttendance")]
+        [HttpGet("GetAttendance")]
         [Authorize] // Ensure the user is authenticated
-        public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
+        public async Task<IActionResult> GetAttendance([FromQuery] AttendanceHistoryRequest request)
         {
+            // Retrieve PtslId and Role from the JWT token claims
             var ptslId = User.FindFirst("PtslId")?.Value;
-            var roleId = int.Parse(User.FindFirst(ClaimTypes.Role)?.Value ?? "0");
+            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (ptslId == null || roleId == 0)
+            if (string.IsNullOrEmpty(ptslId) || string.IsNullOrEmpty(roleClaim) || !int.TryParse(roleClaim, out int roleId))
             {
-                return Unauthorized(new { statusCode = 401, message = "Invalid token", data = (object)null });
+                return Unauthorized(new { statusCode = 401, message = "Invalid token or role", data = (object)null });
             }
 
+            // Retrieve the teamId for the user
             var teamId = await _context.Users
                 .Where(u => u.PtslId == ptslId)
                 .Select(u => u.TeamId)
@@ -38,9 +40,10 @@ namespace PTSLAttendanceManager.Controllers
 
             if (teamId == 0)
             {
-                return Unauthorized(new { statusCode = 401, message = "User's team not found", data = (object)null });
+                return NotFound(new { statusCode = 404, message = "User's team not found", data = (object)null });
             }
 
+            // Execute stored procedure using FromSqlRaw with parameterized query
             var result = await _context.AttendanceHistory
                 .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
                             new SqlParameter("@PtslId", ptslId),
