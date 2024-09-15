@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PTSLAttendanceManager.Controllers;
 using PTSLAttendanceManager.Models;
 using PTSLAttendanceManager.Models.Entity;
 using YourNamespace.Models;
@@ -29,6 +30,8 @@ namespace PTSLAttendanceManager.Data
         public DbSet<AttendanceHistory> AttendanceHistory { get; set; }
 
         public DbSet<AttendanceConfigResult> AttendanceConfigResult { get; set; }
+        public DbSet<AttendanceHistoryRequest> AttendanceHistoryRequest {get; set; }
+        public DbSet<AttendanceHistoryDto> AttendanceHistoryDto { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -39,6 +42,8 @@ namespace PTSLAttendanceManager.Data
             builder.Entity<UserConfigDto>().HasNoKey();  
             builder.Entity<AttendanceHistory>().HasNoKey();
             builder.Entity<AttendanceConfigResult>().HasNoKey();
+            builder.Entity<AttendanceHistoryRequest>().HasNoKey();
+            builder.Entity<AttendanceHistoryDto>().HasNoKey();
         }
 
     }

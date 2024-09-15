@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
+using PTSLAttendanceManager.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -23,20 +24,28 @@ namespace PTSLAttendanceManager.Controllers
         [Authorize] // Ensure the user is authenticated
         public async Task<IActionResult> GetAttendance([FromQuery] AttendanceHistoryRequest request)
         {
-            // Retrieve PtslId and Role from the JWT token claims
+            // Retrieve PtslId from the JWT token claims
             var ptslId = User.FindFirst("PtslId")?.Value;
-            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (string.IsNullOrEmpty(ptslId) || string.IsNullOrEmpty(roleClaim) || !int.TryParse(roleClaim, out int roleId))
+            if (string.IsNullOrEmpty(ptslId))
             {
                 return Unauthorized(new { statusCode = 401, message = "Invalid token or role", data = (object)null });
             }
 
-            // Retrieve the teamId for the user
-            var teamId = await _context.Users
+            // Retrieve the user's RoleId and TeamId from the database
+            var user = await _context.Users
                 .Where(u => u.PtslId == ptslId)
-                .Select(u => u.TeamId)
+                .Select(u => new { u.RoleId, u.TeamId })
                 .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return Unauthorized(new { statusCode = 401, message = "Invalid token or role", data = (object)null });
+            }
+
+            // Handle nullable types with a default value or explicit conversion
+            long roleId = user.RoleId ; // Use a default value if RoleId is null
+            long teamId = user.TeamId ?? 0; // Use a default value if TeamId is null
 
             if (teamId == 0)
             {
@@ -44,13 +53,15 @@ namespace PTSLAttendanceManager.Controllers
             }
 
             // Execute stored procedure using FromSqlRaw with parameterized query
-            var result = await _context.AttendanceHistory
-                .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
-                            new SqlParameter("@PtslId", ptslId),
-                            new SqlParameter("@RoleId", roleId),
-                            new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
-                            new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
-                .ToListAsync();
+            var result = await _context.Set<AttendanceHistoryDto>()
+    .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
+                new SqlParameter("@PtslId", ptslId),
+                new SqlParameter("@RoleId", roleId),
+                new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
+                new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
+    .ToListAsync();
+
+
 
             return Ok(new
             {
