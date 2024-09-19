@@ -20,9 +20,9 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAttendance")]
-        [Authorize] // Ensure the user is authenticated
-        public async Task<IActionResult> GetAttendance([FromQuery] AttendanceHistoryRequest request)
+        [HttpGet("GetAttendance")] 
+        [Authorize] 
+        public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
             // Retrieve PtslId from the JWT token claims
             var ptslId = User.FindFirst("PtslId")?.Value;
@@ -44,7 +44,7 @@ namespace PTSLAttendanceManager.Controllers
             }
 
             // Handle nullable types with a default value or explicit conversion
-            long roleId = user.RoleId ; // Use a default value if RoleId is null
+            long roleId = user.RoleId; // Use a default value if RoleId is null
             long teamId = user.TeamId ?? 0; // Use a default value if TeamId is null
 
             if (teamId == 0)
@@ -54,14 +54,12 @@ namespace PTSLAttendanceManager.Controllers
 
             // Execute stored procedure using FromSqlRaw with parameterized query
             var result = await _context.Set<AttendanceHistoryDto>()
-    .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
-                new SqlParameter("@PtslId", ptslId),
-                new SqlParameter("@RoleId", roleId),
-                new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
-                new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
-    .ToListAsync();
-
-
+                .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
+                    new SqlParameter("@PtslId", ptslId),
+                    new SqlParameter("@RoleId", roleId),
+                    new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
+                    new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
+                .ToListAsync();
 
             return Ok(new
             {

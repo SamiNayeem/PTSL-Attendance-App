@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization; // Correct import for Authorize attribute
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -42,12 +42,15 @@ namespace PTSLAttendanceManager.Controllers
 
             try
             {
-                // Execute stored procedure using FromSqlRaw with parameterized query
+                // Fetch all data using the stored procedure and handle it in-memory
                 var result = await _context.UserConfigDtos
                     .FromSqlRaw("EXEC Config @PtslId", ptslIdParam)
-                    .ToListAsync();
+                    .AsNoTracking() // Avoid Entity Framework tracking issues
+                    .ToListAsync(); // Fetch all results into a list
 
-                if (!result.Any())
+                var userProfile = result.FirstOrDefault(); // Get the first result or null
+
+                if (userProfile == null)
                 {
                     return NotFound(new
                     {
@@ -57,11 +60,27 @@ namespace PTSLAttendanceManager.Controllers
                     });
                 }
 
+                // Returning the single object in the expected format
                 return Ok(new
                 {
                     statusCode = 200,
                     message = "Data retrieved successfully",
-                    data = result
+                    data = new
+                    {
+                        ptslId = userProfile.PtslId,
+                        name = userProfile.Name,
+                        phone = userProfile.Phone,
+                        designation = userProfile.Designation,
+                        email = userProfile.Email,
+                        isActive = userProfile.IsActive,
+                        office = userProfile.Office,
+                        officeAddress = userProfile.OfficeAddress,
+                        officeLatitude = userProfile.OfficeLatitude,
+                        officeLongitude = userProfile.OfficeLongitude,
+                        officeRadius = userProfile.OfficeRadius,
+                        teamName = userProfile.TeamName,
+                        role = userProfile.Role
+                    }
                 });
             }
             catch (Exception ex)

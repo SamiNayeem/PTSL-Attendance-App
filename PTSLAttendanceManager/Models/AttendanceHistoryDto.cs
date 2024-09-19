@@ -8,8 +8,8 @@
         public DateTime Date { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
-        public TimeSpan? CheckIn { get; set; }  // Changed to TimeSpan
-        public TimeSpan? CheckOut { get; set; }  // Changed to TimeSpan
+        public TimeSpan? CheckIn { get; set; }  
+        public TimeSpan? CheckOut { get; set; }  
         public bool IsOnLocation { get; set; }
         public double? AttendanceLatitude { get; set; }
         public double? AttendanceLongitude { get; set; }
