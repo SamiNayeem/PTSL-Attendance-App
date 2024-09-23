@@ -52,10 +52,24 @@ namespace PTSLAttendanceManager.Controllers
                 return BadRequest(new { statusCode = 400, message = "You are outside the location radius.", data = (object)null });
             }
 
-            // Check if user is checking in or out based on IsCheckedIn flag
+            // Handle new check-in
             if (request.IsCheckedIn == 0)
             {
-                
+                // Check if there is an active check-in (without a checkout)
+                var activeCheckIn = await _context.Attendance
+                    .Where(a => a.UserId == ptslId && a.Date == DateTime.Today && a.IsCheckedIn && !a.IsCheckedOut)
+                    .OrderByDescending(a => a.CheckIn)
+                    .FirstOrDefaultAsync();
+
+                if (activeCheckIn != null)
+                {
+                    // Automatically checkout the previous check-in with current time
+                    activeCheckIn.CheckOut = DateTime.Now;
+                    activeCheckIn.IsCheckedOut = true;
+                    await _context.SaveChangesAsync();
+                }
+
+                // Now proceed to create a new check-in
                 var newAttendance = new Attendance
                 {
                     UserId = ptslId,
@@ -109,7 +123,7 @@ namespace PTSLAttendanceManager.Controllers
             }
             else if (request.IsCheckedIn == 1)
             {
-                // Find today's latest attendance record
+                // Handle Check-Out
                 var latestAttendance = await _context.Attendance
                     .Where(a => a.UserId == ptslId && a.Date == DateTime.Today && a.IsCheckedIn && !a.IsCheckedOut)
                     .OrderByDescending(a => a.CheckIn)
@@ -120,7 +134,6 @@ namespace PTSLAttendanceManager.Controllers
                     return BadRequest(new { statusCode = 400, message = "No active check-in found for checkout.", data = (object)null });
                 }
 
-                // Handle Check-Out
                 latestAttendance.CheckOut = DateTime.Now;
                 latestAttendance.IsCheckedOut = true;
                 latestAttendance.IsCheckedIn = false;
@@ -174,8 +187,7 @@ namespace PTSLAttendanceManager.Controllers
         public string? Description { get; set; }
         public required double Latitude { get; set; }
         public required double Longitude { get; set; }
-        public required bool IsOnLocation { get; set; } 
-        public required int IsCheckedIn { get; set; }  
+        public required bool IsOnLocation { get; set; }
+        public required int IsCheckedIn { get; set; }
     }
 }
-
