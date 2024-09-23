@@ -178,3 +178,4 @@ namespace PTSLAttendanceManager.Controllers
         public required int IsCheckedIn { get; set; }  
     }
 }
+
