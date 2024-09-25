@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PTSLAttendanceManager.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,13 +36,28 @@ namespace PTSLAttendanceManager.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
-                    Logitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false),
                     Radius = table.Column<long>(type: "bigint", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Offices", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Otp",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OTP = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Otp", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -82,14 +97,17 @@ namespace PTSLAttendanceManager.Migrations
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Designation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OfficeId = table.Column<long>(type: "bigint", nullable: false),
-                    JoiningDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    JoiningDate = table.Column<DateOnly>(type: "date", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeviceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceUId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeviceModel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LeavingDate = table.Column<DateOnly>(type: "date", nullable: true),
                     RoleId = table.Column<long>(type: "bigint", nullable: false),
-                    TeamId = table.Column<long>(type: "bigint", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    TeamId = table.Column<long>(type: "bigint", nullable: true),
+                    UserType = table.Column<long>(type: "bigint", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    SessionInfo = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -110,8 +128,7 @@ namespace PTSLAttendanceManager.Migrations
                         name: "FK_Users_Teams_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Teams",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -122,8 +139,11 @@ namespace PTSLAttendanceManager.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsOnLocation = table.Column<bool>(type: "bit", nullable: false),
                     CheckIn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CheckOut = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsCheckedIn = table.Column<bool>(type: "bit", nullable: false),
+                    CheckOut = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsCheckedOut = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
                     Longitude = table.Column<double>(type: "float", nullable: false)
@@ -140,24 +160,24 @@ namespace PTSLAttendanceManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OtherAttendances",
+                name: "OtherAttendance",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AttendanceId = table.Column<long>(type: "bigint", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
-                    Logitude = table.Column<double>(type: "float", nullable: false)
+                    Longitude = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OtherAttendances", x => x.Id);
+                    table.PrimaryKey("PK_OtherAttendance", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OtherAttendances_Attendance_AttendanceId",
+                        name: "FK_OtherAttendance_Attendance_AttendanceId",
                         column: x => x.AttendanceId,
                         principalTable: "Attendance",
                         principalColumn: "Id",
@@ -170,8 +190,8 @@ namespace PTSLAttendanceManager.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OtherAttendances_AttendanceId",
-                table: "OtherAttendances",
+                name: "IX_OtherAttendance_AttendanceId",
+                table: "OtherAttendance",
                 column: "AttendanceId");
 
             migrationBuilder.CreateIndex(
@@ -197,7 +217,10 @@ namespace PTSLAttendanceManager.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "OtherAttendances");
+                name: "OtherAttendance");
+
+            migrationBuilder.DropTable(
+                name: "Otp");
 
             migrationBuilder.DropTable(
                 name: "Attendance");

@@ -1,5 +1,8 @@
-﻿namespace PTSLAttendanceManager.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace PTSLAttendanceManager.Models
 {
+
     public class UserConfigDto
     {
         public string? PtslId { get; set; }

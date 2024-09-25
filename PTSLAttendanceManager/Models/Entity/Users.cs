@@ -24,7 +24,8 @@ namespace PTSLAttendanceManager.Models.Entity
         public DateOnly? JoiningDate { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
-        public string? DeviceId { get; set; }
+        public string? DeviceUId { get; set; }
+        public string? DeviceModel { get; set; }
         public DateOnly? LeavingDate { get; set; }
         public long RoleId { get; set; }
 

@@ -16,7 +16,7 @@ namespace PTSLAttendanceManager.Models.Entity
         [ForeignKey(nameof(AttendanceId))]
         public required Attendance Attendance { get; set; }
 
-        public required string Image { get; set; }
+        public virtual byte[] Image { get; set; } =new byte[0];
         public required string Title { get; set; }
         public string? Description { get; set; }
 

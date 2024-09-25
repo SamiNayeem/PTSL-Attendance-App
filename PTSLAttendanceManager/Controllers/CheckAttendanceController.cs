@@ -4,6 +4,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models;
+using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -20,8 +22,8 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAttendance")] 
-        [Authorize] 
+        [HttpGet("GetAttendance")]  // Change to POST as the body is passed
+        [Authorize]  // Authorization via Bearer Token
         public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
             // Retrieve PtslId from the JWT token claims
@@ -43,17 +45,13 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new { statusCode = 401, message = "Invalid token or role", data = (object)null });
             }
 
-            // Handle nullable types with a default value or explicit conversion
-            long roleId = user.RoleId; // Use a default value if RoleId is null
-            long teamId = user.TeamId ?? 0; // Use a default value if TeamId is null
+            long roleId = user.RoleId;
+            
 
-            if (teamId == 0)
-            {
-                return NotFound(new { statusCode = 404, message = "User's team not found", data = (object)null });
-            }
+            
 
             // Execute stored procedure using FromSqlRaw with parameterized query
-            var result = await _context.Set<AttendanceHistoryDto>()
+            var attendanceHistory = await _context.Set<AttendanceHistoryDto>()
                 .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
                     new SqlParameter("@PtslId", ptslId),
                     new SqlParameter("@RoleId", roleId),
@@ -61,11 +59,23 @@ namespace PTSLAttendanceManager.Controllers
                     new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
                 .ToListAsync();
 
+            // Convert byte[] image to Base64 string for each attendance record
+                
+
+                foreach (var attendance in attendanceHistory)
+                {
+                    if (attendance.Image != null)
+                    {
+                        attendance.Image = Convert.FromBase64String(Convert.ToBase64String(attendance.Image));
+                    }
+                }
+
+
             return Ok(new
             {
                 statusCode = 200,
                 message = "Attendance data retrieved successfully",
-                data = result
+                data = attendanceHistory
             });
         }
     }

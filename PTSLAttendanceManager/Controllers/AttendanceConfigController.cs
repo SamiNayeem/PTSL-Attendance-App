@@ -33,16 +33,16 @@ namespace PTSLAttendanceManager.Controllers
                 }
 
                 // Fetch all records for the current day
-                var attendanceConfig = await _context.AttendanceConfigResult
-                    .FromSqlRaw("EXEC AttendanceConfig @PtslId = {0}", ptslId)
-                    .ToListAsync();
+                var attendanceConfig = await _context.Database.SqlQueryRaw<AttendanceConfigResult>("EXEC AttendanceConfig @PtslId = {0}", ptslId)
+                                     .ToListAsync();
+
 
                 // Get the first entry for office data regardless of checkin/checkout
                 var result = attendanceConfig.FirstOrDefault();
 
                 // Calculate earliest CheckIn and latest CheckOut, if they exist
                 var checkIn = attendanceConfig.Where(a => a.CheckInTime.HasValue).Min(a => a.CheckInTime);
-                var checkOut = attendanceConfig.Where(a => a.CheckOutTime.HasValue).Max(a => a.CheckOutTime);
+                //var checkOut = attendanceConfig.Where(a => a.CheckOutTime.HasValue).Max(a => a.CheckOutTime);
 
                 return Ok(new
                 {
@@ -55,7 +55,7 @@ namespace PTSLAttendanceManager.Controllers
                         OfficeRadius = result.OfficeRadius,
                         Date = result.AttendanceDate,
                         CheckIn = checkIn,  // Earliest CheckIn time, null if no check-in found
-                        CheckOut = checkOut  // Latest CheckOut time, null if no check-out found
+                        CheckOut = attendanceConfig.Last().CheckOutTime  // Checkout time for the latest record
                     }
                 });
             }
@@ -76,7 +76,7 @@ namespace PTSLAttendanceManager.Controllers
         {
             public double OfficeLatitude { get; set; }
             public double OfficeLongitude { get; set; }
-            public double OfficeRadius { get; set; }
+            public long OfficeRadius { get; set; }
             public DateTime? AttendanceDate { get; set; }
             public DateTime? CheckInTime { get; set; }
             public DateTime? CheckOutTime { get; set; }

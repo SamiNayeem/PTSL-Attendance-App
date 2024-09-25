@@ -12,8 +12,8 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240911120336_initial1.13")]
-    partial class initial113
+    [Migration("20240925113627_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,53 +24,6 @@ namespace PTSLAttendanceManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.AttendanceConfigResult", b =>
-                {
-                    b.Property<DateTime?>("AttendanceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CheckInTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CheckOutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("OfficeLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("OfficeLongitude")
-                        .HasColumnType("float");
-
-                    b.Property<long>("OfficeRadius")
-                        .HasColumnType("bigint");
-
-                    b.ToTable("AttendanceConfigResult");
-                });
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.AttendanceHistory", b =>
-                {
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<long>("Month")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("PtslId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TeamID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("Year")
-                        .HasColumnType("bigint");
-
-                    b.ToTable("AttendanceHistory");
-                });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.Attendance", b =>
                 {
@@ -192,9 +145,9 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Image")
+                    b.Property<byte[]>("Image")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -268,7 +221,10 @@ namespace PTSLAttendanceManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DeviceId")
+                    b.Property<string>("DeviceModel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceUId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -315,50 +271,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.UserConfigDto", b =>
-                {
-                    b.Property<string>("Designation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Office")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OfficeAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("OfficeLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("OfficeLongitude")
-                        .HasColumnType("float");
-
-                    b.Property<long>("OfficeRadius")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PtslId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TeamName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("UserConfigDtos");
                 });
 
             modelBuilder.Entity("YourNamespace.Models.Otp", b =>

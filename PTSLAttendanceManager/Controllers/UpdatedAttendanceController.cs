@@ -93,7 +93,7 @@ namespace PTSLAttendanceManager.Controllers
                     {
                         AttendanceId = newAttendance.Id,
                         Attendance = newAttendance,
-                        Image = request.Image ?? string.Empty,
+                        Image = request.Image,
                         Title = request.Title ?? "Attended from other place",
                         Description = request.Description,
                         Latitude = request.Latitude,
@@ -117,7 +117,8 @@ namespace PTSLAttendanceManager.Controllers
                         checkIn = newAttendance.CheckIn,
                         checkOut = (DateTime?)null,
                         latitude = newAttendance.Latitude,
-                        longitude = newAttendance.Longitude
+                        longitude = newAttendance.Longitude,
+                        //image = request.Image
                     }
                 });
             }
@@ -182,7 +183,7 @@ namespace PTSLAttendanceManager.Controllers
 
     public class AttendanceRequest
     {
-        public string? Image { get; set; }
+        public byte[] Image { get; set; }= new byte[0];
         public string? Title { get; set; }
         public string? Description { get; set; }
         public required double Latitude { get; set; }

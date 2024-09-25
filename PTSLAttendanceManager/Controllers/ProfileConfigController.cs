@@ -43,10 +43,12 @@ namespace PTSLAttendanceManager.Controllers
             try
             {
                 // Fetch all data using the stored procedure and handle it in-memory
-                var result = await _context.UserConfigDtos
-                    .FromSqlRaw("EXEC Config @PtslId", ptslIdParam)
-                    .AsNoTracking() // Avoid Entity Framework tracking issues
+                var result = await _context.Database.SqlQueryRaw<UserConfigDto>("EXEC Config @PtslId", ptslIdParam)
+                    
                     .ToListAsync(); // Fetch all results into a list
+
+                
+
 
                 var userProfile = result.FirstOrDefault(); // Get the first result or null
 
@@ -69,7 +71,7 @@ namespace PTSLAttendanceManager.Controllers
                     {
                         ptslId = userProfile.PtslId,
                         name = userProfile.Name,
-                        phone = userProfile.Phone,
+                        phone = "+880"+userProfile.Phone,
                         designation = userProfile.Designation,
                         email = userProfile.Email,
                         isActive = userProfile.IsActive,

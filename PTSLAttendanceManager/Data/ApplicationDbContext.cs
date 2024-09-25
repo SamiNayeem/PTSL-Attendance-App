@@ -25,13 +25,13 @@ namespace PTSLAttendanceManager.Data
         public DbSet<Otp> Otp { get; set; }
 
 
-        public DbSet<UserConfigDto> UserConfigDtos { get; set; }
+        //public DbSet<UserConfigDto> UserConfigDtos { get; set; }
 
-        public DbSet<AttendanceHistory> AttendanceHistory { get; set; }
+        //public DbSet<AttendanceHistory> AttendanceHistory { get; set; }
 
-        public DbSet<AttendanceConfigResult> AttendanceConfigResult { get; set; }
-        public DbSet<AttendanceHistoryRequest> AttendanceHistoryRequest {get; set; }
-        public DbSet<AttendanceHistoryDto> AttendanceHistoryDto { get; set; }
+        //public DbSet<AttendanceConfigResult> AttendanceConfigResult { get; set; }
+        //public DbSet<AttendanceHistoryRequest> AttendanceHistoryRequest {get; set; }
+        //public DbSet<AttendanceHistoryDto> AttendanceHistoryDto { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -39,11 +39,11 @@ namespace PTSLAttendanceManager.Data
             base.OnModelCreating(builder);
 
             // Optional: You can configure this DbSet to be ignored for migrations, as it's not a table
-            builder.Entity<UserConfigDto>().HasNoKey();  
-            builder.Entity<AttendanceHistory>().HasNoKey();
-            builder.Entity<AttendanceConfigResult>().HasNoKey();
-            builder.Entity<AttendanceHistoryRequest>().HasNoKey();
-            builder.Entity<AttendanceHistoryDto>().HasNoKey();
+            //builder.Entity<UserConfigDto>().HasNoKey().ToView("UserConfigDto");
+            //builder.Entity<AttendanceHistory>().HasNoKey();
+            //builder.Entity<AttendanceConfigResult>().HasNoKey();
+            //builder.Entity<AttendanceHistoryRequest>().HasNoKey();
+            //builder.Entity<AttendanceHistoryDto>().HasNoKey();
         }
 
     }
