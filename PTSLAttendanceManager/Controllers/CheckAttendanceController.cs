@@ -51,18 +51,18 @@ namespace PTSLAttendanceManager.Controllers
             
 
             // Execute stored procedure using FromSqlRaw with parameterized query
-            var attendanceHistory = await _context.Set<AttendanceHistoryDto>()
-                .FromSqlRaw("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
+            var attendanceHistory = await _context.Database.SqlQueryRaw<AttendanceHistoryDto>("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
                     new SqlParameter("@PtslId", ptslId),
                     new SqlParameter("@RoleId", roleId),
                     new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
                     new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
-                .ToListAsync();
+                                .ToListAsync();
 
+            
             // Convert byte[] image to Base64 string for each attendance record
-                
 
-                foreach (var attendance in attendanceHistory)
+
+            foreach (var attendance in attendanceHistory)
                 {
                     if (attendance.Image != null)
                     {

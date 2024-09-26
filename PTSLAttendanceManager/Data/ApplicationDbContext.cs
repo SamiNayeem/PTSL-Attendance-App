@@ -23,6 +23,7 @@ namespace PTSLAttendanceManager.Data
         public DbSet<Notification> Notifications { get; set; }
 
         public DbSet<Otp> Otp { get; set; }
+        public DbSet<ProxyLogs> ProxyLogs { get; set; }
 
 
         //public DbSet<UserConfigDto> UserConfigDtos { get; set; }
@@ -34,16 +35,34 @@ namespace PTSLAttendanceManager.Data
         //public DbSet<AttendanceHistoryDto> AttendanceHistoryDto { get; set; }
 
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
+        //protected override void OnModelCreating(ModelBuilder builder)
+        //{
+        //    base.OnModelCreating(builder);
 
-            // Optional: You can configure this DbSet to be ignored for migrations, as it's not a table
-            //builder.Entity<UserConfigDto>().HasNoKey().ToView("UserConfigDto");
-            //builder.Entity<AttendanceHistory>().HasNoKey();
-            //builder.Entity<AttendanceConfigResult>().HasNoKey();
-            //builder.Entity<AttendanceHistoryRequest>().HasNoKey();
-            //builder.Entity<AttendanceHistoryDto>().HasNoKey();
+        //    // Optional: You can configure this DbSet to be ignored for migrations, as it's not a table
+        //    //builder.Entity<UserConfigDto>().HasNoKey().ToView("UserConfigDto");
+        //    //builder.Entity<AttendanceHistory>().HasNoKey();
+        //    //builder.Entity<AttendanceConfigResult>().HasNoKey();
+        //    //builder.Entity<AttendanceHistoryRequest>().HasNoKey();
+        //    //builder.Entity<AttendanceHistoryDto>().HasNoKey();
+        //}
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProxyLogs>()
+                .HasOne(pl => pl.ProxyGiver)
+                .WithMany() // No reverse navigation needed
+                .HasForeignKey(pl => pl.ProxyGiverId)
+                .OnDelete(DeleteBehavior.Restrict);  // Prevent cascading delete
+
+            modelBuilder.Entity<ProxyLogs>()
+                .HasOne(pl => pl.AbsentPerson)
+                .WithMany() // No reverse navigation needed
+                .HasForeignKey(pl => pl.AbsentPersonId)
+                .OnDelete(DeleteBehavior.Restrict);  // Prevent cascading delete
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

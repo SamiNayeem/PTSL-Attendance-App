@@ -36,13 +36,24 @@ namespace PTSLAttendanceManager.Controllers
                 var attendanceConfig = await _context.Database.SqlQueryRaw<AttendanceConfigResult>("EXEC AttendanceConfig @PtslId = {0}", ptslId)
                                      .ToListAsync();
 
-
                 // Get the first entry for office data regardless of checkin/checkout
                 var result = attendanceConfig.FirstOrDefault();
 
-                // Calculate earliest CheckIn and latest CheckOut, if they exist
-                var checkIn = attendanceConfig.Where(a => a.CheckInTime.HasValue).Min(a => a.CheckInTime);
-                //var checkOut = attendanceConfig.Where(a => a.CheckOutTime.HasValue).Max(a => a.CheckOutTime);
+                // Check if attendanceConfig contains any records
+                if (result == null)
+                {
+                    return NotFound(new { statusCode = 404, message = "No attendance data found for today" });
+                }
+
+                // Gather all CheckIn and CheckOut times
+                var checkInCheckOutTimes = attendanceConfig
+                    .Where(a => a.CheckInTime.HasValue || a.CheckOutTime.HasValue)
+                    .Select(a => new
+                    {
+                        CheckIn = a.CheckInTime,
+                        CheckOut = a.CheckOutTime
+                    })
+                    .ToList();
 
                 return Ok(new
                 {
@@ -54,8 +65,7 @@ namespace PTSLAttendanceManager.Controllers
                         OfficeLong = result.OfficeLongitude,
                         OfficeRadius = result.OfficeRadius,
                         Date = result.AttendanceDate,
-                        CheckIn = checkIn,  // Earliest CheckIn time, null if no check-in found
-                        CheckOut = attendanceConfig.Last().CheckOutTime  // Checkout time for the latest record
+                        CheckInCheckOutList = checkInCheckOutTimes  // List of CheckIn and CheckOut times
                     }
                 });
             }

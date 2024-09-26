@@ -38,11 +38,26 @@ namespace PTSLAttendanceManager.Controllers
 
             if (otherUserWithSameDevice != null)
             {
-                // If another user is found with the same DeviceUId, return an error
+                // Log the proxy attempt in ProxyLogs table
+                var proxyLog = new ProxyLogs
+                {
+                    Date = DateTime.Now,
+                    ProxyGiverId = user.PtslId,
+                    AbsentPersonId = otherUserWithSameDevice.PtslId,
+                    Remarks = "Proxy login attempt detected",
+                    ProxyGiver = otherUserWithSameDevice,
+                    AbsentPerson = user
+                };
+
+                // Add the log to the database
+                _context.ProxyLogs.Add(proxyLog);
+                await _context.SaveChangesAsync();
+
+                // Return an error message indicating a proxy attempt
                 return Unauthorized(new
                 {
                     statusCode = 401,
-                    message = "This device is already registered with another user. You have been blacklisted for attempting proxy",
+                    message = "This device is already registered with another user. You have been blacklisted for attempting proxy.",
                     data = new { conflictingUser = otherUserWithSameDevice.PtslId }
                 });
             }
@@ -84,6 +99,7 @@ namespace PTSLAttendanceManager.Controllers
                 data = new { }
             });
         }
+
 
 
 
