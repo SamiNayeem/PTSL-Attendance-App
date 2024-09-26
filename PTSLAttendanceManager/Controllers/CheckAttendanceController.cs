@@ -22,7 +22,7 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAttendance")]  // Change to POST as the body is passed
+        [HttpPost("GetAttendance")]  // POST for accepting body
         [Authorize]  // Authorization via Bearer Token
         public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
@@ -34,7 +34,7 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new { statusCode = 401, message = "Invalid token or role", data = (object)null });
             }
 
-            // Retrieve the user's RoleId and TeamId from the database
+            // Retrieve the user's RoleId from the database
             var user = await _context.Users
                 .Where(u => u.PtslId == ptslId)
                 .Select(u => new { u.RoleId, u.TeamId })
@@ -46,36 +46,38 @@ namespace PTSLAttendanceManager.Controllers
             }
 
             long roleId = user.RoleId;
-            
-
-            
 
             // Execute stored procedure using FromSqlRaw with parameterized query
-            var attendanceHistory = await _context.Database.SqlQueryRaw<AttendanceHistoryDto>("EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
+            var attendanceHistory = await _context.Database.SqlQueryRaw<AttendanceHistoryDto>(
+                    "EXEC dbo.GetRoleBasedAttendance @PtslId, @RoleId, @Month, @Year",
                     new SqlParameter("@PtslId", ptslId),
                     new SqlParameter("@RoleId", roleId),
                     new SqlParameter("@Month", (object)request.Month ?? DBNull.Value),
                     new SqlParameter("@Year", (object)request.Year ?? DBNull.Value))
-                                .ToListAsync();
+                .ToListAsync();
 
-            
-            // Convert byte[] image to Base64 string for each attendance record
-
-
-            foreach (var attendance in attendanceHistory)
+            // Group the results by Date, and select the first CheckIn and last CheckOut for each day
+            var groupedAttendance = attendanceHistory
+                .GroupBy(a => new { a.PtslId, a.Date.Date })  // Group by user and date
+                .Select(g => new
                 {
-                    if (attendance.Image != null)
-                    {
-                        attendance.Image = Convert.FromBase64String(Convert.ToBase64String(attendance.Image));
-                    }
-                }
-
+                    PtslId = g.Key.PtslId,
+                    Name = g.First().Name,
+                    TeamName = g.First().TeamName,
+                    Date = g.Key.Date,  // The date
+                    CheckIn = g.Min(a => a.CheckIn),  // Get the earliest CheckIn time
+                    CheckOut = g.Max(a => a.CheckOut),  // Get the latest CheckOut time
+                    AttendanceLatitude = g.First().AttendanceLatitude,
+                    AttendanceLongitude = g.First().AttendanceLongitude,
+                    IsOnLocation = g.First().IsOnLocation
+                })
+                .ToList();
 
             return Ok(new
             {
                 statusCode = 200,
                 message = "Attendance data retrieved successfully",
-                data = attendanceHistory
+                data = groupedAttendance
             });
         }
     }
