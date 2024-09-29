@@ -15,6 +15,7 @@ namespace PTSLAttendanceManager.Models.Entity
         public required DateTime CheckIn { get; set; }
         public DateTime? CheckOut { get; set; } = null;
         public TimeSpan TotalSpendingHour { get; set; }
+        public TimeSpan TotalWorkingHour { get; set; }
     }
 }
 

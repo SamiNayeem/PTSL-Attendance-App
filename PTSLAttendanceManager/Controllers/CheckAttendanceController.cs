@@ -22,7 +22,7 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAttendance")]  // POST for accepting body
+        [HttpGet("GetAttendance")]  
         [Authorize]  // Authorization via Bearer Token
         public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
