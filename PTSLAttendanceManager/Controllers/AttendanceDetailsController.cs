@@ -42,11 +42,27 @@ namespace PTSLAttendanceManager.Controllers
                     return NotFound(new { statusCode = 404, message = "No attendance data found for the specified date and user.", data = (object)null });
                 }
 
+                // Convert Image byte[] to Base64 string
+                var transformedAttendanceDetails = attendanceDetails.Select(a => new
+                {
+                    a.PtslId,
+                    a.Name,
+                    a.Date,
+                    a.CheckIn,
+                    a.CheckOut,
+                    a.IsOnLocation,
+                    a.Title,
+                    a.Description,
+                    Image = a.Image != null ? Convert.ToBase64String(a.Image) : null,  // Convert byte[] to Base64 string
+                    a.Latitude,
+                    a.Longitude
+                }).ToList();
+
                 return Ok(new
                 {
                     statusCode = 200,
                     message = "Attendance details retrieved successfully",
-                    data = attendanceDetails
+                    data = transformedAttendanceDetails
                 });
             }
             catch (Exception ex)
@@ -65,12 +81,14 @@ namespace PTSLAttendanceManager.Controllers
     public class AttendanceDetailsDto
     {
         public string PtslId { get; set; }
+        public string Name { get; set; }
         public DateTime Date { get; set; }
         public DateTime? CheckIn { get; set; }
         public DateTime? CheckOut { get; set; }
         public bool IsOnLocation { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public byte[]? Image { get; set; }  // Original byte[] image field
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
     }
