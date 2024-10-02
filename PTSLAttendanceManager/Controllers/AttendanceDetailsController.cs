@@ -42,7 +42,7 @@ namespace PTSLAttendanceManager.Controllers
                     return NotFound(new { statusCode = 404, message = "No attendance data found for the specified date and user.", data = (object)null });
                 }
 
-                // Convert Image byte[] to Base64 string
+                
                 var transformedAttendanceDetails = attendanceDetails.Select(a => new
                 {
                     a.PtslId,
@@ -77,7 +77,7 @@ namespace PTSLAttendanceManager.Controllers
         }
     }
 
-    // DTO to match the result set of the stored procedure
+    
     public class AttendanceDetailsDto
     {
         public string PtslId { get; set; }

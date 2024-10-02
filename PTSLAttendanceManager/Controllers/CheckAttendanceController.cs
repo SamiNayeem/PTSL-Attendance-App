@@ -22,7 +22,7 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAttendance")]  
+        [HttpPost("GetAttendance")]  // POST for accepting body
         [Authorize]  // Authorization via Bearer Token
         public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
@@ -58,7 +58,7 @@ namespace PTSLAttendanceManager.Controllers
 
             // Group the results by Date, and select the first CheckIn and last CheckOut for each day
             var groupedAttendance = attendanceHistory
-                .GroupBy(a => new { a.PtslId, a.Date.Date })  // Group by user and date
+                .GroupBy(a => new { a.PtslId, Date = a.Date.Date })  // Group by user and date
                 .Select(g => new
                 {
                     PtslId = g.Key.PtslId,
@@ -66,7 +66,7 @@ namespace PTSLAttendanceManager.Controllers
                     TeamName = g.First().TeamName,
                     Date = g.Key.Date,  // The date
                     CheckIn = g.Min(a => a.CheckIn),  // Get the earliest CheckIn time
-                    CheckOut = g.Max(a => a.CheckOut),  // Get the latest CheckOut time
+                    CheckOut = g.OrderByDescending(a => a.CheckIn).FirstOrDefault()?.CheckOut, // Get CheckOut from the last CheckIn entry
                     AttendanceLatitude = g.First().AttendanceLatitude,
                     AttendanceLongitude = g.First().AttendanceLongitude,
                     IsOnLocation = g.First().IsOnLocation

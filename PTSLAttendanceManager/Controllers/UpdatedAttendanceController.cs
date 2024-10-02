@@ -87,7 +87,7 @@ namespace PTSLAttendanceManager.Controllers
                 _context.Attendance.Add(newAttendance);
 
                 // If the user is outside the office radius, record OtherAttendance
-                if (!isOnLocation)
+                if (request.Title != null)
                 {
                     var otherAttendance = new OtherAttendance
                     {
