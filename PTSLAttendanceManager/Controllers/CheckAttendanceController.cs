@@ -22,7 +22,7 @@ namespace PTSLAttendanceManager.Controllers
             _context = context;
         }
 
-        [HttpPost("GetAttendance")]  // POST for accepting body
+        [HttpPost("GetAttendance")]
         [Authorize]  // Authorization via Bearer Token
         public async Task<IActionResult> GetAttendance([FromBody] AttendanceHistoryRequest request)
         {
@@ -71,6 +71,8 @@ namespace PTSLAttendanceManager.Controllers
                     AttendanceLongitude = g.First().AttendanceLongitude,
                     IsOnLocation = g.First().IsOnLocation
                 })
+                .OrderBy(a => a.Name)
+                .OrderByDescending(a => a.Date)
                 .ToList();
 
             return Ok(new

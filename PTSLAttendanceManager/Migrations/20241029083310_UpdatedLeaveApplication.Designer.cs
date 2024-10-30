@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PTSLAttendanceManager.Data;
 
@@ -11,9 +12,11 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241029083310_UpdatedLeaveApplication")]
+    partial class UpdatedLeaveApplication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,25 +24,6 @@ namespace PTSLAttendanceManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.ApprovalStatus", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApprovalStatus");
-                });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.Attendance", b =>
                 {
@@ -101,9 +85,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<DateOnly>("ApplyingDate")
                         .HasColumnType("date");
 
-                    b.Property<long?>("ApprovalStatusId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime?>("ApprovedByHRAt")
                         .HasColumnType("datetime2");
 
@@ -125,9 +106,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<bool>("IsApprovedByProjectManager")
                         .HasColumnType("bit");
 
-                    b.Property<long>("LeaveDurationId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("LeaveTypeId")
                         .HasColumnType("bigint");
 
@@ -144,51 +122,19 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<DateOnly>("ToDate")
                         .HasColumnType("date");
 
-                    b.Property<long>("TotalDays")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long>("UserWiseLeaveId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStatusId");
-
                     b.HasIndex("AssignedTo");
-
-                    b.HasIndex("LeaveDurationId");
 
                     b.HasIndex("LeaveTypeId");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserWiseLeaveId");
-
                     b.ToTable("LeaveApplication");
-                });
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveDuration", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LeaveDuration");
                 });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveType", b =>
@@ -403,40 +349,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.ToTable("Teams");
                 });
 
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.UserWiseLeave", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("PendingCasualLeave")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PendingEarnedLeave")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PendingMaternityLeave")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PendingSickLeave")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserWiseLeave");
-                });
-
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.Users", b =>
                 {
                     b.Property<string>("PtslId")
@@ -538,20 +450,10 @@ namespace PTSLAttendanceManager.Migrations
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveApplication", b =>
                 {
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.ApprovalStatus", "ApprovalStatus")
-                        .WithMany()
-                        .HasForeignKey("ApprovalStatusId");
-
                     b.HasOne("PTSLAttendanceManager.Models.Entity.Users", "AssignedUser")
                         .WithMany()
                         .HasForeignKey("AssignedTo")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.LeaveDuration", "LeaveDuration")
-                        .WithMany()
-                        .HasForeignKey("LeaveDurationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("PTSLAttendanceManager.Models.Entity.LeaveType", "LeaveType")
                         .WithMany()
@@ -565,23 +467,11 @@ namespace PTSLAttendanceManager.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.UserWiseLeave", "UserWiseLeave")
-                        .WithMany()
-                        .HasForeignKey("UserWiseLeaveId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApprovalStatus");
-
                     b.Navigation("AssignedUser");
-
-                    b.Navigation("LeaveDuration");
 
                     b.Navigation("LeaveType");
 
                     b.Navigation("User");
-
-                    b.Navigation("UserWiseLeave");
                 });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.OtherAttendance", b =>
@@ -612,17 +502,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.Navigation("AbsentPerson");
 
                     b.Navigation("ProxyGiver");
-                });
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.UserWiseLeave", b =>
-                {
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.Users", b =>

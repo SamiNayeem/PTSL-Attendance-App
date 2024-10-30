@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PTSLAttendanceManager.Data;
 
@@ -11,9 +12,11 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241030054411_UpdatedLeave5")]
+    partial class UpdatedLeave5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,7 +104,7 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<DateOnly>("ApplyingDate")
                         .HasColumnType("date");
 
-                    b.Property<long?>("ApprovalStatusId")
+                    b.Property<long?>("ApprovalStatus")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("ApprovedByHRAt")
@@ -155,8 +158,6 @@ namespace PTSLAttendanceManager.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovalStatusId");
 
                     b.HasIndex("AssignedTo");
 
@@ -538,10 +539,6 @@ namespace PTSLAttendanceManager.Migrations
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveApplication", b =>
                 {
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.ApprovalStatus", "ApprovalStatus")
-                        .WithMany()
-                        .HasForeignKey("ApprovalStatusId");
-
                     b.HasOne("PTSLAttendanceManager.Models.Entity.Users", "AssignedUser")
                         .WithMany()
                         .HasForeignKey("AssignedTo")
@@ -570,8 +567,6 @@ namespace PTSLAttendanceManager.Migrations
                         .HasForeignKey("UserWiseLeaveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApprovalStatus");
 
                     b.Navigation("AssignedUser");
 

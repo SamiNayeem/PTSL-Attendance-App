@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PTSLAttendanceManager.Data;
 
@@ -11,9 +12,11 @@ using PTSLAttendanceManager.Data;
 namespace PTSLAttendanceManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241029065645_LeaveApplication")]
+    partial class LeaveApplication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,25 +24,6 @@ namespace PTSLAttendanceManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.ApprovalStatus", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApprovalStatus");
-                });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.Attendance", b =>
                 {
@@ -98,11 +82,11 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<string>("AddressDuringLeave")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("AgreedByAssigneeAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateOnly>("ApplyingDate")
                         .HasColumnType("date");
-
-                    b.Property<long?>("ApprovalStatusId")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("ApprovedByHRAt")
                         .HasColumnType("datetime2");
@@ -113,10 +97,10 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<string>("AssignedTo")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateOnly>("FromDate")
-                        .HasColumnType("date");
-
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsApprovedByAsignee")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsApprovedByHR")
@@ -125,14 +109,8 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<bool>("IsApprovedByProjectManager")
                         .HasColumnType("bit");
 
-                    b.Property<long>("LeaveDurationId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("LeaveTypeId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -140,12 +118,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("ToDate")
-                        .HasColumnType("date");
-
-                    b.Property<long>("TotalDays")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -156,11 +128,7 @@ namespace PTSLAttendanceManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStatusId");
-
                     b.HasIndex("AssignedTo");
-
-                    b.HasIndex("LeaveDurationId");
 
                     b.HasIndex("LeaveTypeId");
 
@@ -169,26 +137,6 @@ namespace PTSLAttendanceManager.Migrations
                     b.HasIndex("UserWiseLeaveId");
 
                     b.ToTable("LeaveApplication");
-                });
-
-            modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveDuration", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LeaveDuration");
                 });
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveType", b =>
@@ -201,9 +149,6 @@ namespace PTSLAttendanceManager.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<long>("TotalLeaveDays")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -411,19 +356,22 @@ namespace PTSLAttendanceManager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("CasualLeave")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<long>("PendingCasualLeave")
+                    b.Property<long>("PaidLeave")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("PendingEarnedLeave")
+                    b.Property<long>("SickLeave")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("PendingMaternityLeave")
+                    b.Property<long>("TotalLeave")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("PendingSickLeave")
+                    b.Property<long>("TotalLeaves")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UserId")
@@ -538,20 +486,10 @@ namespace PTSLAttendanceManager.Migrations
 
             modelBuilder.Entity("PTSLAttendanceManager.Models.Entity.LeaveApplication", b =>
                 {
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.ApprovalStatus", "ApprovalStatus")
-                        .WithMany()
-                        .HasForeignKey("ApprovalStatusId");
-
                     b.HasOne("PTSLAttendanceManager.Models.Entity.Users", "AssignedUser")
                         .WithMany()
                         .HasForeignKey("AssignedTo")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PTSLAttendanceManager.Models.Entity.LeaveDuration", "LeaveDuration")
-                        .WithMany()
-                        .HasForeignKey("LeaveDurationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("PTSLAttendanceManager.Models.Entity.LeaveType", "LeaveType")
                         .WithMany()
@@ -568,14 +506,10 @@ namespace PTSLAttendanceManager.Migrations
                     b.HasOne("PTSLAttendanceManager.Models.Entity.UserWiseLeave", "UserWiseLeave")
                         .WithMany()
                         .HasForeignKey("UserWiseLeaveId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ApprovalStatus");
-
                     b.Navigation("AssignedUser");
-
-                    b.Navigation("LeaveDuration");
 
                     b.Navigation("LeaveType");
 

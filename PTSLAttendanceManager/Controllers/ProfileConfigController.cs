@@ -45,7 +45,7 @@ namespace PTSLAttendanceManager.Controllers
                 // Fetch all data using the stored procedure and handle it in-memory
                 var result = await _context.Database.SqlQueryRaw<UserConfigDto>("EXEC Config @PtslId", ptslIdParam)
                     
-                    .ToListAsync(); // Fetch all results into a list
+                    .ToListAsync();
 
                 
 
@@ -80,7 +80,9 @@ namespace PTSLAttendanceManager.Controllers
                         officeLatitude = userProfile.OfficeLatitude,
                         officeLongitude = userProfile.OfficeLongitude,
                         officeRadius = userProfile.OfficeRadius,
+                        teamId = userProfile.TeamId,
                         teamName = userProfile.TeamName,
+                        roleId = userProfile.RoleId,
                         role = userProfile.Role
                     }
                 });

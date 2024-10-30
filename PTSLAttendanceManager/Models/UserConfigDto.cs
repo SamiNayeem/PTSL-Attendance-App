@@ -19,7 +19,9 @@ namespace PTSLAttendanceManager.Models
         public double OfficeLatitude { get; set; } 
         public double OfficeLongitude { get; set; } 
         public long OfficeRadius { get; set; }
+        public long TeamId { get; set; }
         public string? TeamName { get; set; }
+        public long RoleId { get; set; }
         public string? Role { get; set; }
     }
 }

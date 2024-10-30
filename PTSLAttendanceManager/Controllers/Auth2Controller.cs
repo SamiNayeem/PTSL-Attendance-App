@@ -57,28 +57,32 @@ namespace PTSLAttendanceManager.Controllers
                 return Unauthorized(new
                 {
                     statusCode = 401,
-                    message = "This device is already registered with another user. You have been blacklisted for attempting proxy.",
+                    message = "This device is already registered with another user.",
                     data = new { conflictingUser = otherUserWithSameDevice.PtslId }
                 });
             }
 
-            // Case 2: If the user does not have a DeviceUId set, store the current DeviceUId and DeviceModel
-            if (string.IsNullOrEmpty(user.DeviceUId))
+            // Case 2: Check if the PtslId is PTSL999
+            if (request.PtslId == "PTSL999")
+            {
+                user.DeviceUId = null; // Set DeviceUId to null
+            }
+            else if (string.IsNullOrEmpty(user.DeviceUId))
             {
                 // Store the new DeviceUId and DeviceModel
                 user.DeviceUId = request.DeviceUId;
                 user.DeviceModel = request.DeviceModel;
-
-                // Save changes to the database
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    statusCode = 200,
-                    message = "Login successful, device information stored.",
-                    data = new { otp = "123456" } // Replace with OTP generation logic
-                });
             }
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                statusCode = 200,
+                message = "Login successful, device information processed.",
+                data = new { otp = "123456" } // Replace with OTP generation logic
+            });
 
             // Case 3: If the DeviceUId matches the current user, allow login
             if (user.DeviceUId == request.DeviceUId)
@@ -95,7 +99,7 @@ namespace PTSLAttendanceManager.Controllers
             return Unauthorized(new
             {
                 statusCode = 401,
-                message = "Device does not match the current user.",
+                message = "You've already registered on another device. Please inform administration if you have changed your device.",
                 data = new { }
             });
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using PTSLAttendanceManager.Controllers;
 using PTSLAttendanceManager.Models;
 using PTSLAttendanceManager.Models.Entity;
@@ -24,28 +25,15 @@ namespace PTSLAttendanceManager.Data
 
         public DbSet<Otp> Otp { get; set; }
         public DbSet<ProxyLogs> ProxyLogs { get; set; }
+        public DbSet<ScheduleTime> ScheduleTime { get; set; }
+        public DbSet<LeaveType> LeaveType { get; set; }
+        public DbSet<UserWiseLeave> UserWiseLeave { get; set; }
+        public DbSet<LeaveApplication> LeaveApplication { get; set; }
+        public DbSet<LeaveDuration> LeaveDuration { get; set; }
+        public DbSet<ApprovalStatus> ApprovalStatus { get; set; }
 
 
-        //public DbSet<UserConfigDto> UserConfigDtos { get; set; }
 
-        //public DbSet<AttendanceHistory> AttendanceHistory { get; set; }
-
-        //public DbSet<AttendanceConfigResult> AttendanceConfigResult { get; set; }
-        //public DbSet<AttendanceHistoryRequest> AttendanceHistoryRequest {get; set; }
-        //public DbSet<AttendanceHistoryDto> AttendanceHistoryDto { get; set; }
-
-
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
-
-        //    // Optional: You can configure this DbSet to be ignored for migrations, as it's not a table
-        //    //builder.Entity<UserConfigDto>().HasNoKey().ToView("UserConfigDto");
-        //    //builder.Entity<AttendanceHistory>().HasNoKey();
-        //    //builder.Entity<AttendanceConfigResult>().HasNoKey();
-        //    //builder.Entity<AttendanceHistoryRequest>().HasNoKey();
-        //    //builder.Entity<AttendanceHistoryDto>().HasNoKey();
-        //}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -61,6 +49,28 @@ namespace PTSLAttendanceManager.Data
                 .WithMany() // No reverse navigation needed
                 .HasForeignKey(pl => pl.AbsentPersonId)
                 .OnDelete(DeleteBehavior.Restrict);  // Prevent cascading delete
+
+            // LeaveType Configuration
+            modelBuilder.Entity<LeaveType>()
+                .HasMany<LeaveApplication>()
+                .WithOne(la => la.LeaveType)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // LeaveApplication Configuration
+            modelBuilder.Entity<LeaveApplication>()
+                .HasOne(la => la.User)
+                .WithMany()
+                .HasForeignKey(la => la.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LeaveApplication>()
+                .HasOne(la => la.AssignedUser)
+                .WithMany()
+                .HasForeignKey(la => la.AssignedTo)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
 
             base.OnModelCreating(modelBuilder);
         }
