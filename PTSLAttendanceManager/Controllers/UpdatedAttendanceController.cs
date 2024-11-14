@@ -135,9 +135,26 @@ namespace PTSLAttendanceManager.Controllers
                     return BadRequest(new { statusCode = 400, message = "No active check-in found for checkout.", data = (object)null });
                 }
 
+                if (latestAttendance.IsOnLocation == true && request.IsOnLocation == false)
+                {
+                    return BadRequest(new { StatusCode = 400, message = "You must checkout from office area since you checked in from office area" });
+                    
+                    //var errorLog = new ErrorLogs
+                    //{
+                    //    UserId = ptslId,
+                    //    Date = DateTime.Now,
+                    //    ErrorMessage = "User must checkout from office area since they checked in from office area",
+                    //    Latitude = request.Latitude,
+                    //    Longitude = request.Longitude,
+                    //    IsActive = true
+                    //};
+                }
+
                 latestAttendance.CheckOut = DateTime.Now;
                 latestAttendance.IsCheckedOut = true;
                 latestAttendance.IsCheckedIn = false;
+                latestAttendance.CheckoutLatitude = request.Latitude;
+                latestAttendance.CheckoutLongitude = request.Longitude;
 
                 await _context.SaveChangesAsync();
 

@@ -25,6 +25,9 @@ namespace PTSLAttendanceManager.Models.Entity
         public required double Latitude { get; set; }
         public required double Longitude { get; set; }
 
+        public double CheckoutLatitude { get; set; }
+        public double CheckoutLongitude { get; set; }
+
         public void Deactivate()
         {
             IsActive = false;

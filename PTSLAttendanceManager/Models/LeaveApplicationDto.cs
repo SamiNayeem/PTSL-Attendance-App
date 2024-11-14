@@ -2,6 +2,7 @@
 {
     public class LeaveApplicationDto
     {
+        public long Id { get; set; }
         public string Name { get; set; }
         public DateTime ApplyingDate { get; set; }
         public DateTime FromDate { get; set; }

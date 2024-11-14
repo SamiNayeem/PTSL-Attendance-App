@@ -32,6 +32,7 @@ namespace PTSLAttendanceManager.Data
         public DbSet<LeaveDuration> LeaveDuration { get; set; }
         public DbSet<ApprovalStatus> ApprovalStatus { get; set; }
 
+        public DbSet<VersionControl> VersionControl { get; set; }
 
 
 
