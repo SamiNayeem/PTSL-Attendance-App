@@ -27,11 +27,25 @@ namespace PTSLAttendanceManager.Jobs
                     .Where(a => a.IsCheckedIn && !a.IsCheckedOut)
                     .ToListAsync();
 
+                
+
                 foreach (var record in recordsToUpdate)
                 {
                     // Set checkout time to check-in time
                     record.CheckOut = record.CheckIn;
+                    
+                    
+                    record.Remarks = "User did not check out.";
                     record.IsCheckedOut = true;
+
+                    //var firstCheckInTime = await _context.Attendance
+                    //    .Where(a => a.UserId == record.UserId && a.CheckIn.Date == today)
+                    //    .OrderBy(a => a.CheckIn)
+                    //    .Select(a => a.CheckIn)
+                    //    .FirstOrDefaultAsync();
+
+                    //record.CheckOut = firstCheckInTime.AddHours(8);
+
                 }
 
                 await _context.SaveChangesAsync();

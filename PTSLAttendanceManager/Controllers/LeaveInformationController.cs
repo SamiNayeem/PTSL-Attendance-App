@@ -21,8 +21,8 @@ namespace PTSLAttendanceManager.Controllers
         }
 
         [HttpPost("GetPendingLeave")]
-        [Authorize] // Ensure correct authorization
-        public async Task<IActionResult> GetPendingLeave()
+        [Authorize]
+        public async Task<IActionResult> GetPendingLeave([FromBody] GetPendingLeaveRequest request)
         {
             // Retrieve the PtslId from the JWT token claims
             var ptslId = User.FindFirst("PtslId")?.Value;
@@ -37,9 +37,12 @@ namespace PTSLAttendanceManager.Controllers
                 });
             }
 
-            // Retrieve the UserWiseLeave record for the given PtslId
+            // Determine which UserId to use for the query
+            var userIdToQuery = string.IsNullOrEmpty(request.UserIdParam) ? ptslId : request.UserIdParam;
+
+            // Retrieve the UserWiseLeave record for the given UserId
             var userLeave = await _context.UserWiseLeave
-                .Where(leave => leave.UserId == ptslId && leave.IsActive)
+                .Where(leave => leave.UserId == userIdToQuery && leave.IsActive)
                 .FirstOrDefaultAsync();
 
             if (userLeave == null)
@@ -47,7 +50,7 @@ namespace PTSLAttendanceManager.Controllers
                 return NotFound(new
                 {
                     statusCode = 404,
-                    message = "No pending leaves found for the given PtslId",
+                    message = $"No pending leaves found for the given UserId: {userIdToQuery}",
                     data = new object() { }
                 });
             }
@@ -58,38 +61,25 @@ namespace PTSLAttendanceManager.Controllers
                 .ToListAsync();
 
             // Create a list to hold the dynamic response
-            var leaveData = new List<object>();
-
-            foreach (var leaveType in leaveTypes)
+            var leaveData = leaveTypes.Select(leaveType =>
             {
-                long remaining = 0;
-
-                // Match the leave type and get the corresponding remaining leave from UserWiseLeave
-                switch (leaveType.Type.ToLower())
+                long remaining = leaveType.Type.ToLower() switch
                 {
-                    case "earned":
-                        remaining = userLeave.PendingEarnedLeave;
-                        break;
-                    case "casual":
-                        remaining = userLeave.PendingCasualLeave;
-                        break;
-                    case "sick":
-                        remaining = userLeave.PendingSickLeave;
-                        break;
-                    case "maternity":
-                        remaining = userLeave.PendingMaternityLeave;
-                        break;
-                }
+                    "earned" => userLeave.PendingEarnedLeave,
+                    "casual" => userLeave.PendingCasualLeave,
+                    "sick" => userLeave.PendingSickLeave,
+                    "maternity" => userLeave.PendingMaternityLeave,
+                    _ => 0
+                };
 
-                // Add the leave type data to the list
-                leaveData.Add(new
+                return new
                 {
                     id = leaveType.Id,
                     label = leaveType.Type,
                     total = leaveType.TotalLeaveDays,
-                    remaining = remaining
-                });
-            }
+                    remaining
+                };
+            }).ToList();
 
             return Ok(new
             {
@@ -98,5 +88,11 @@ namespace PTSLAttendanceManager.Controllers
                 data = leaveData
             });
         }
+
     }
+    public class GetPendingLeaveRequest
+    {
+        public string? UserIdParam { get; set; } // Optional UserId
+    }
+
 }

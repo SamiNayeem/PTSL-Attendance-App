@@ -169,7 +169,9 @@ namespace PTSLAttendanceManager.Controllers
                         checkIn = latestAttendance.CheckIn,
                         checkOut = latestAttendance.CheckOut,
                         latitude = latestAttendance.Latitude,
-                        longitude = latestAttendance.Longitude
+                        longitude = latestAttendance.Longitude,
+                        checkOutLat = latestAttendance.CheckoutLatitude,
+                        checkOutLong = latestAttendance.CheckoutLongitude
                     }
                 });
             }

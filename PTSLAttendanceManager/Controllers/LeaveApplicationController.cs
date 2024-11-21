@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PTSLAttendanceManager.Models;
+using Microsoft.Data.SqlClient;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -81,6 +82,13 @@ namespace PTSLAttendanceManager.Controllers
                 });
             }
 
+            // Ensure the correct type is used for ApprovalStatusId
+            long approvalStatusId = 3;
+
+            // Retrieve the ApprovalStatus or create a default
+            var approvalStatus = await _context.ApprovalStatus.FindAsync(approvalStatusId)
+                                 ?? new ApprovalStatus { Id = approvalStatusId, Status = "On Hold", IsActive = true };
+
             // Create a new leave application record
             var newLeaveApplication = new LeaveApplication
             {
@@ -102,7 +110,8 @@ namespace PTSLAttendanceManager.Controllers
                 AddressDuringLeave = request.AddressDuringLeave,
                 IsApprovedByProjectManager = false,
                 IsApprovedByHR = false,
-                ApprovalStatus = await _context.ApprovalStatus.FindAsync(3), // 3 = On Hold
+                ApprovalStatus = approvalStatus,
+                ApprovalStatusId = approvalStatusId,
                 Status = "Pending",
                 Remarks = null,
                 IsActive = true
@@ -189,11 +198,11 @@ namespace PTSLAttendanceManager.Controllers
 
                 leaveApplication.IsApprovedByProjectManager = true;
                 leaveApplication.ApprovedByProjectManagerAt = DateTime.UtcNow;
-                leaveApplication.Status = "Approved by PM";
+                leaveApplication.Status = "Approved";
             }
             else if (request.Flag == 0) // Reject
             {
-                leaveApplication.Status = "Rejected by PM";
+                leaveApplication.Status = "Rejected";
                 leaveApplication.IsActive = false;
             }
             else
@@ -211,7 +220,7 @@ namespace PTSLAttendanceManager.Controllers
             return Ok(new
             {
                 statusCode = 200,
-                message = request.Flag == 1 ? "Leave application approved by Project Manager" : "Leave application rejected by Project Manager",
+                message = request.Flag == 1 ? "Approved" : "Rejected",
                 data = new
                 {
                     leaveApplication.Id,
@@ -299,7 +308,7 @@ namespace PTSLAttendanceManager.Controllers
             // Retrieve the leave application
             var leaveApplication = await _context.LeaveApplication
                 .Include(la => la.UserWiseLeave)
-                .FirstOrDefaultAsync(la => la.Id == request.LeaveApplicationId && la.IsActive );
+                .FirstOrDefaultAsync(la => la.Id == request.LeaveApplicationId && la.IsActive);
 
             if (leaveApplication == null)
             {
@@ -313,11 +322,11 @@ namespace PTSLAttendanceManager.Controllers
 
             if (request.Flag == 1) // Approve
             {
-                
+
 
                 leaveApplication.IsApprovedByHR = true;
                 leaveApplication.ApprovedByHRAt = DateTime.UtcNow;
-                leaveApplication.Status = "Acknowledged by HR";
+                leaveApplication.Status = "Approved, Acknowledged";
             }
             // HR can not reject leave approval
             //else if (request.Flag == 0) // Reject
@@ -340,16 +349,152 @@ namespace PTSLAttendanceManager.Controllers
             return Ok(new
             {
                 statusCode = 200,
-                message = request.Flag == 1 ? "Leave application acknowledged by Project Manager" ,
+                message = "Approved, Acknowledged",
                 data = new
                 {
                     leaveApplication.Id,
                     leaveApplication.Status,
-                    leaveApplication.IsApprovedByProjectManager,
-                    leaveApplication.ApprovedByProjectManagerAt
+                    leaveApplication.IsApprovedByHR,
+                    leaveApplication.ApprovedByHRAt
                 }
             });
         }
-    }
 
+        [HttpGet("GetLeaveApplicationsHistory")]
+        [Authorize] // Ensure correct authorization
+        public async Task<IActionResult> GetLeaveApplicationHistory()
+        {
+            // Retrieve the UserId from JWT claims
+            var userId = User.FindFirst("PtslId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new
+                {
+                    statusCode = 401,
+                    message = "Invalid token or role",
+                    data = (object)null
+                });
+            }
+
+            // Get RoleId from the database
+            //var user = await _context.Users
+            //    .Where(u => u.PtslId == userId)
+            //    .Select(u => new { u.RoleId })
+            //    .FirstOrDefaultAsync();
+
+            //if (user == null)
+            //{
+            //    return Unauthorized(new
+            //    {
+            //        statusCode = 401,
+            //        message = "Invalid token or role",
+            //        data = (object)null
+            //    });
+            //}
+
+            //long roleId = user.RoleId;
+            var userIdParam = new SqlParameter("@UserId", userId);
+            
+
+            try
+            {
+                // Fetch data using the stored procedure
+                var result = await _context.Database.SqlQueryRaw<GetLeaveApplicationHistory>(
+    "EXEC GetLeaveApplicationHistory @UserId", userIdParam
+).ToListAsync();
+
+                if (result == null || result.Count == 0)
+                {
+                    return NotFound(new
+                    {
+                        statusCode = 404,
+                        message = "No leave applications found",
+                        data = new List<GetLeaveApplicationHistory>()
+                    });
+                }
+
+                // Return list of leave applications
+                return Ok(new
+                {
+                    statusCode = 200,
+                    message = "Leave applications retrieved successfully",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    statusCode = 500,
+                    message = "An error occurred while retrieving leave applications.",
+                    error = ex.Message
+                });
+            }
+        }
+        [HttpPost("CancelLeave")]
+        [Authorize]
+        public async Task<IActionResult> CancelLeave([FromBody] CancelLeaveRequest request)
+        {
+            // Retrieve the PtslId from the JWT token claims
+            var ptslId = User.FindFirst("PtslId")?.Value;
+
+            if (string.IsNullOrEmpty(ptslId))
+            {
+                return Unauthorized(new
+                {
+                    statusCode = 401,
+                    message = "Invalid token",
+                    data = new object() { }
+                });
+            }
+
+            // Retrieve the leave application for the given LeaveApplicationId and UserId
+            var leaveApplication = await _context.LeaveApplication
+                .Where(la => la.Id == request.LeaveApplicationId && la.UserId == ptslId && la.IsActive)
+                .FirstOrDefaultAsync();
+
+            if (leaveApplication == null)
+            {
+                return NotFound(new
+                {
+                    statusCode = 404,
+                    message = "Leave application not found or cannot be canceled",
+                    data = new object() { }
+                });
+            }
+
+            // Check if the cancellation is allowed (current date must be before FromDate)
+            if (DateOnly.FromDateTime(DateTime.UtcNow) >= leaveApplication.FromDate)
+            {
+                return BadRequest(new
+                {
+                    statusCode = 400,
+                    message = "Leave application cannot be canceled on or after the start date.",
+                    data = new object() { }
+                });
+            }
+
+            // Mark the leave application as inactive
+            leaveApplication.IsActive = false;
+            leaveApplication.Status = "Canceled";
+
+            // Save changes
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                statusCode = 200,
+                message = "Leave application canceled successfully",
+                data = new
+                {
+                    leaveApplication.Id,
+                    leaveApplication.IsActive
+                }
+            });
+        }
+
+
+    }
 }
+
+  
