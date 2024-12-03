@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Jobs;
+using PTSLAttendanceManager.Models;
 using PTSLAttendanceManager.Models.Entity;
 using PTSLAttendanceManager.Services;
 using Quartz;
@@ -14,8 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure DbContext with SQL Server
+//string connectionStringtest= "Server=103.95.97.156;Database=PTSLAttendance;User Id=sa;Password=ptsl@sql2022;  TrustServerCertificate=True;";
+string encryptionKey = "sT9y3X7kfE&ZDg6q";
+//string encryptedConnectionString = EncryptoEngine.Encrypt(connectionStringtest, encryptionKey);
+//Console.WriteLine("abcd");
+
+
+string connectionString = EncryptoEngine.Decrypt(builder.Configuration.GetConnectionString("DefaultConnection"), encryptionKey);
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 
 // Add HttpClient service
 builder.Services.AddHttpClient();

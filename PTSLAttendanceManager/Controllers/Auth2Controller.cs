@@ -78,6 +78,7 @@ namespace PTSLAttendanceManager.Controllers
                     message = "Login successful, device information stored.",
                     data = new { otp = "123456" } // Replace with OTP generation logic
                 });
+                
             }
 
             // Case 3: If the DeviceUId matches the current user, allow login
