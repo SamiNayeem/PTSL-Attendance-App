@@ -61,6 +61,17 @@ namespace PTSLAttendanceManager.Controllers
                                 (leave.FromDate <= request.ToDate && leave.ToDate >= request.FromDate))
                 .AnyAsync();
 
+            // Check if the assigned person is the same as the applicant
+            if (request.AssignedTo == ptslId)
+            {
+                return BadRequest(new
+                {
+                    statusCode = 400,
+                    message = "Assigned person cannot be the same as the applicant.",
+                    data = new object() { }
+                });
+            }
+
             if (assignedPersonLeaveConflict)
             {
                 return BadRequest(new
