@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -42,7 +39,7 @@ namespace PTSLAttendanceManager.Controllers
                     return NotFound(new { statusCode = 404, message = "No attendance data found for the specified date and user.", data = (object)null });
                 }
 
-                
+
                 var transformedAttendanceDetails = attendanceDetails.Select(a => new
                 {
                     a.PtslId,
@@ -77,7 +74,7 @@ namespace PTSLAttendanceManager.Controllers
         }
     }
 
-    
+
     public class AttendanceDetailsDto
     {
         public string PtslId { get; set; }

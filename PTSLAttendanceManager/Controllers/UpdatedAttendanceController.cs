@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models.Entity;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -138,7 +136,7 @@ namespace PTSLAttendanceManager.Controllers
                 if (latestAttendance.IsOnLocation == true && request.IsOnLocation == false)
                 {
                     return BadRequest(new { StatusCode = 400, message = "You must checkout from office area since you checked in from office area" });
-                    
+
                     //var errorLog = new ErrorLogs
                     //{
                     //    UserId = ptslId,
@@ -202,7 +200,7 @@ namespace PTSLAttendanceManager.Controllers
 
     public class AttendanceRequest
     {
-        public byte[] Image { get; set; }= new byte[0];
+        public byte[] Image { get; set; } = new byte[0];
         public string? Title { get; set; }
         public string? Description { get; set; }
         public required double Latitude { get; set; }

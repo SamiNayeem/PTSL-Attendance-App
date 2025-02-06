@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using PTSLAttendanceManager.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models;
 
 namespace PTSLAttendanceManager.Controllers
@@ -95,5 +92,5 @@ namespace PTSLAttendanceManager.Controllers
     }
 
 
-    
+
 }

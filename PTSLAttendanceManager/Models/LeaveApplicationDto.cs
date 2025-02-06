@@ -15,7 +15,7 @@
         public string AssignedTo { get; set; }
         public string AddressDuringLeave { get; set; }
         public bool ProjectManagerApproval { get; set; }
-        
+
         public bool HRApproval { get; set; }
         public string Status { get; set; }
         public long PendingSickLeave { get; set; }

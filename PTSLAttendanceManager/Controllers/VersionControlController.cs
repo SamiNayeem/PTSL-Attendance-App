@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using System;
-using System.Threading.Tasks;
-using PTSLAttendanceManager.Models.Entity;
 using PTSLAttendanceManager.Models;
 
 namespace PTSLAttendanceManager.Controllers
@@ -22,7 +19,7 @@ namespace PTSLAttendanceManager.Controllers
         [HttpPost("CheckForUpdate")]
         public async Task<IActionResult> CheckForUpdate([FromBody] VersionCheckRequest request)
         {
-            
+
             var latestVersion = await _context.VersionControl
                 .OrderByDescending(v => v.Date)
                 .FirstOrDefaultAsync();
@@ -37,7 +34,7 @@ namespace PTSLAttendanceManager.Controllers
                 });
             }
 
-            
+
             bool isUpdateAvailable = CompareVersions(latestVersion.Version, request.CurrentVersion);
             bool isForceUpdateAvailable = isUpdateAvailable && latestVersion.IsForceUpdateAvailable;
 
@@ -54,7 +51,7 @@ namespace PTSLAttendanceManager.Controllers
             });
         }
 
-        
+
         private bool CompareVersions(string latestVersion, string currentVersion)
         {
             var latestVersionParts = latestVersion.Split('.');
@@ -72,5 +69,5 @@ namespace PTSLAttendanceManager.Controllers
         }
     }
 
-    
+
 }

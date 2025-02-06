@@ -1,8 +1,6 @@
-﻿using Quartz;
+﻿using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
+using Quartz;
 
 namespace PTSLAttendanceManager.Jobs
 {
@@ -27,14 +25,14 @@ namespace PTSLAttendanceManager.Jobs
                     .Where(a => a.IsCheckedIn && !a.IsCheckedOut)
                     .ToListAsync();
 
-                
+
 
                 foreach (var record in recordsToUpdate)
                 {
                     // Set checkout time to check-in time
                     record.CheckOut = record.CheckIn;
-                    
-                    
+
+
                     record.Remarks = "User did not check out.";
                     record.IsCheckedOut = true;
 

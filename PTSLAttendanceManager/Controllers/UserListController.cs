@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -43,7 +41,7 @@ namespace PTSLAttendanceManager.Controllers
             long roleId = user.RoleId;
 
             // Check if the user has permission to view the list
-            if (roleId >= 2 && roleId <= 6)
+            if (roleId >= 2 && roleId <= 7)
             {
                 // If RoleId is 2, 3, 4, 5, or 6, return the list of users
                 var usersList = await _context.Users
@@ -63,7 +61,7 @@ namespace PTSLAttendanceManager.Controllers
                     .ToListAsync()
 
                     ;
-                
+
 
                 return Ok(new { statusCode = 200, message = "Success", data = usersList });
             }
@@ -71,7 +69,7 @@ namespace PTSLAttendanceManager.Controllers
             {
                 // If RoleId is 7, return only the user's own information
                 var userInfo = await _context.Users
-                    .Where(u => u.PtslId == ptslId )
+                    .Where(u => u.PtslId == ptslId)
                     .Select(u => new
                     {
                         u.PtslId,
@@ -81,7 +79,7 @@ namespace PTSLAttendanceManager.Controllers
                         u.Email,
                         u.RoleId,
                         u.TeamId
-                        
+
                     })
                     .FirstOrDefaultAsync();
 

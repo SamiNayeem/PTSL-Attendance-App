@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using PTSLAttendanceManager.Controllers;
-using PTSLAttendanceManager.Models;
 using PTSLAttendanceManager.Models.Entity;
 using YourNamespace.Models;
 

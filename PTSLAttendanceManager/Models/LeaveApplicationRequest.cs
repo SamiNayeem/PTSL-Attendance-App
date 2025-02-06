@@ -11,6 +11,7 @@
         public string? Reason { get; set; }
         public string? AssignedTo { get; set; }
         public string? AddressDuringLeave { get; set; }
+        public string? ApprovedBy { get; set; }
     }
 
 }

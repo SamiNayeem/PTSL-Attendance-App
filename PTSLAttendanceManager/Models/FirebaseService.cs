@@ -1,8 +1,4 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using System.Text.Json;
 
 namespace PTSLAttendanceManager.Services
 {
@@ -13,7 +9,7 @@ namespace PTSLAttendanceManager.Services
 
         public FirebaseService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _firebaseApiKey = configuration["Firebase:ApiKey"];  
+            _firebaseApiKey = configuration["Firebase:ApiKey"];
             _httpClientFactory = httpClientFactory;
         }
 

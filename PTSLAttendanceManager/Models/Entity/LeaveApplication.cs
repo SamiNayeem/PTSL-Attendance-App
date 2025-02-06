@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PTSLAttendanceManager.Models.Entity
 {
@@ -28,6 +28,8 @@ namespace PTSLAttendanceManager.Models.Entity
         public String? AddressDuringLeave { get; set; }
         public bool IsApprovedByProjectManager { get; set; } = false;
         public DateTime? ApprovedByProjectManagerAt { get; set; }
+        public string? ApprovedBy { get; set; }
+        public Users? ApprovalPMUser { get; set; }
         public bool IsApprovedByHR { get; set; } = false;
         public DateTime? ApprovedByHRAt { get; set; }
         public long? ApprovalStatusId { get; set; }
@@ -35,6 +37,6 @@ namespace PTSLAttendanceManager.Models.Entity
         public required string Status { get; set; } = "Pending";
         public string? Remarks { get; set; }
         public bool IsActive { get; set; } = true;
-        
+
     }
 }

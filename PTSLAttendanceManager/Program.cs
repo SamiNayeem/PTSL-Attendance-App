@@ -66,14 +66,14 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-// Define the job and trigger
-var jobKey = new JobKey("CheckOutUpdateJob");
-q.AddJob<CheckOutUpdateJob>(opts => opts.WithIdentity(jobKey));
+    // Define the job and trigger
+    var jobKey = new JobKey("CheckOutUpdateJob");
+    q.AddJob<CheckOutUpdateJob>(opts => opts.WithIdentity(jobKey));
 
-q.AddTrigger(opts => opts
-    .ForJob(jobKey)
-    .WithIdentity("CheckOutUpdateTrigger")
-    .WithCronSchedule(cronExpression)); // Use the dynamic CRON expression
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("CheckOutUpdateTrigger")
+        .WithCronSchedule(cronExpression)); // Use the dynamic CRON expression
 });
 
 //// Add Quartz hosted service

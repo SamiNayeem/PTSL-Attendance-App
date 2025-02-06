@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PTSLAttendanceManager.Models.Entity
 {
@@ -16,7 +16,7 @@ namespace PTSLAttendanceManager.Models.Entity
         [ForeignKey(nameof(AttendanceId))]
         public required Attendance Attendance { get; set; }
 
-        public virtual byte[] Image { get; set; } =new byte[0];
+        public virtual byte[] Image { get; set; } = new byte[0];
         public required string Title { get; set; }
         public string? Description { get; set; }
 

@@ -14,14 +14,12 @@ namespace PTSLAttendanceManager.Models
             aes.Mode = CipherMode.CBC;
             ICryptoTransform cipher = aes.CreateEncryptor(aes.Key, aes.IV);
 
-            using (MemoryStream ms = new MemoryStream())
+            using (MemoryStream ms = new())
             {
-                using (CryptoStream cs = new CryptoStream(ms, cipher, CryptoStreamMode.Write))
+                using (CryptoStream cs = new(ms, cipher, CryptoStreamMode.Write))
                 {
-                    using (StreamWriter sw = new StreamWriter(cs))
-                    {
-                        sw.Write(plainText);
-                    }
+                    using StreamWriter sw = new(cs);
+                    sw.Write(plainText);
                 }
 
                 cipherData = ms.ToArray();
@@ -52,24 +50,20 @@ namespace PTSLAttendanceManager.Models
             aes.Mode = CipherMode.CBC;
             ICryptoTransform decipher = aes.CreateDecryptor(aes.Key, aes.IV);
 
-            using (MemoryStream ms = new MemoryStream(cipherText))
+            using MemoryStream ms = new(cipherText);
+            using (CryptoStream cs = new(ms, decipher, CryptoStreamMode.Read))
             {
-                using (CryptoStream cs = new CryptoStream(ms, decipher, CryptoStreamMode.Read))
-                {
-                    using (StreamReader sr = new StreamReader(cs))
-                    {
-                        plainText = sr.ReadToEnd();
-                    }
-                }
-
-                return plainText;
+                using StreamReader sr = new(cs);
+                plainText = sr.ReadToEnd();
             }
+
+            return plainText;
         }
 
         public static string EncryptPin(string input, string key)
         {
             byte[] inputArray = Encoding.UTF8.GetBytes(input);
-            TripleDESCryptoServiceProvider tripleDES = new TripleDESCryptoServiceProvider();
+            TripleDESCryptoServiceProvider tripleDES = new();
             tripleDES.Key = Encoding.UTF8.GetBytes(key);
             tripleDES.Mode = CipherMode.ECB;
             tripleDES.Padding = PaddingMode.PKCS7;
@@ -82,7 +76,7 @@ namespace PTSLAttendanceManager.Models
         public static string DecryptPin(string input, string key)
         {
             byte[] inputArray = Convert.FromBase64String(input);
-            TripleDESCryptoServiceProvider tripleDES = new TripleDESCryptoServiceProvider();
+            TripleDESCryptoServiceProvider tripleDES = new();
             tripleDES.Key = Encoding.UTF8.GetBytes(key);
             tripleDES.Mode = CipherMode.ECB;
             tripleDES.Padding = PaddingMode.PKCS7;

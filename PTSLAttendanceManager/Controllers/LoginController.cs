@@ -90,7 +90,7 @@ public class LoginController : ControllerBase
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-            new Claim(ClaimTypes.Name, model.PtslId)
+            new(ClaimTypes.Name, model.PtslId)
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

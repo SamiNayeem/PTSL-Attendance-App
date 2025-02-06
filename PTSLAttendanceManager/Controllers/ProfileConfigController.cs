@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
 using PTSLAttendanceManager.Models;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -44,10 +41,10 @@ namespace PTSLAttendanceManager.Controllers
             {
                 // Fetch all data using the stored procedure and handle it in-memory
                 var result = await _context.Database.SqlQueryRaw<UserConfigDto>("EXEC Config @PtslId", ptslIdParam)
-                    
+
                     .ToListAsync();
 
-                
+
 
 
                 var userProfile = result.FirstOrDefault(); // Get the first result or null
@@ -71,7 +68,7 @@ namespace PTSLAttendanceManager.Controllers
                     {
                         ptslId = userProfile.PtslId,
                         name = userProfile.Name,
-                        phone = "+880"+userProfile.Phone,
+                        phone = "+880" + userProfile.Phone,
                         designation = userProfile.Designation,
                         email = userProfile.Email,
                         isActive = userProfile.IsActive,

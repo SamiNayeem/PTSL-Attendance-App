@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using PTSLAttendanceManager.Models.Entity;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using PTSLAttendanceManager.Models;
-using Microsoft.Data.SqlClient;
+using PTSLAttendanceManager.Models.Entity;
 
 namespace PTSLAttendanceManager.Controllers
 {
@@ -120,6 +117,8 @@ namespace PTSLAttendanceManager.Controllers
                 AssignedUser = await _context.Users.FirstOrDefaultAsync(u => u.PtslId == request.AssignedTo),
                 AddressDuringLeave = request.AddressDuringLeave,
                 IsApprovedByProjectManager = false,
+                ApprovedBy = null,
+                ApprovalPMUser = null,
                 IsApprovedByHR = false,
                 ApprovalStatus = approvalStatus,
                 ApprovalStatusId = approvalStatusId,
@@ -209,6 +208,7 @@ namespace PTSLAttendanceManager.Controllers
 
                 leaveApplication.IsApprovedByProjectManager = true;
                 leaveApplication.ApprovedByProjectManagerAt = DateTime.UtcNow;
+                leaveApplication.ApprovalPMUser = await _context.Users.FirstOrDefaultAsync(u => u.PtslId == ptslId);
                 leaveApplication.Status = "Approved";
             }
             else if (request.Flag == 0) // Reject
@@ -237,7 +237,8 @@ namespace PTSLAttendanceManager.Controllers
                     leaveApplication.Id,
                     leaveApplication.Status,
                     leaveApplication.IsApprovedByProjectManager,
-                    leaveApplication.ApprovedByProjectManagerAt
+                    leaveApplication.ApprovedByProjectManagerAt,
+                    ApprovalPMUserId = leaveApplication.ApprovalPMUser?.PtslId
                 }
             });
         }
@@ -405,7 +406,7 @@ namespace PTSLAttendanceManager.Controllers
 
             //long roleId = user.RoleId;
             var userIdParam = new SqlParameter("@UserId", userId);
-            
+
 
             try
             {
@@ -508,4 +509,3 @@ namespace PTSLAttendanceManager.Controllers
     }
 }
 
-  

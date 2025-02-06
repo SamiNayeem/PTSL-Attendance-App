@@ -81,8 +81,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
 {

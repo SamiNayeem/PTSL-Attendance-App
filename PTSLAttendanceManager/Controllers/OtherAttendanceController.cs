@@ -54,7 +54,7 @@
 //            _context.Attendance.Add(attendance);
 //            await _context.SaveChangesAsync();
 
-            
+
 //            var otherAttendance = new OtherAttendance
 //            {
 //                AttendanceId = attendance.Id,  
@@ -120,7 +120,7 @@
 
 //            _context.Attendance.Update(attendance);
 
-           
+
 //            otherAttendance.IsActive = false; // Mark as inactive if needed
 
 //            _context.OtherAttendance.Update(otherAttendance);

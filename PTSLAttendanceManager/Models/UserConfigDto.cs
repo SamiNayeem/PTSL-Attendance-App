@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace PTSLAttendanceManager.Models
+﻿namespace PTSLAttendanceManager.Models
 {
 
     public class UserConfigDto
@@ -16,8 +14,8 @@ namespace PTSLAttendanceManager.Models
 
         public string? Office { get; set; }
         public string? OfficeAddress { get; set; }
-        public double OfficeLatitude { get; set; } 
-        public double OfficeLongitude { get; set; } 
+        public double OfficeLatitude { get; set; }
+        public double OfficeLongitude { get; set; }
         public long OfficeRadius { get; set; }
         public long TeamId { get; set; }
         public string? TeamName { get; set; }

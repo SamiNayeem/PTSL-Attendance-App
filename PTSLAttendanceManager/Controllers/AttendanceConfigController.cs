@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PTSLAttendanceManager.Data;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PTSLAttendanceManager.Controllers
 {
