@@ -27,6 +27,9 @@ string connectionString = EncryptoEngine.Decrypt(builder.Configuration.GetConnec
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Add HttpClient service
 builder.Services.AddHttpClient();
 

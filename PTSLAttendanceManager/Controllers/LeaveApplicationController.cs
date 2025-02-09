@@ -208,13 +208,16 @@ namespace PTSLAttendanceManager.Controllers
 
                 leaveApplication.IsApprovedByProjectManager = true;
                 leaveApplication.ApprovedByProjectManagerAt = DateTime.UtcNow;
-                leaveApplication.ApprovalPMUser = await _context.Users.FirstOrDefaultAsync(u => u.PtslId == ptslId);
+                leaveApplication.ApprovedBy = ptslId;
                 leaveApplication.Status = "Approved";
             }
             else if (request.Flag == 0) // Reject
             {
                 leaveApplication.Status = "Rejected";
+                leaveApplication.ApprovedByProjectManagerAt = DateTime.UtcNow;
                 leaveApplication.IsActive = false;
+                leaveApplication.ApprovedBy = ptslId;
+                leaveApplication.IsApprovedByProjectManager = true;
             }
             else
             {
@@ -238,7 +241,7 @@ namespace PTSLAttendanceManager.Controllers
                     leaveApplication.Status,
                     leaveApplication.IsApprovedByProjectManager,
                     leaveApplication.ApprovedByProjectManagerAt,
-                    ApprovalPMUserId = leaveApplication.ApprovalPMUser?.PtslId
+                    leaveApplication.ApprovedBy
                 }
             });
         }
