@@ -50,9 +50,14 @@ namespace PTSLAttendanceManager.Controllers
                 });
             }
 
+
+
             long roleId = user.RoleId;
             var userIdParam = new SqlParameter("@UserId", userId);
             var roleIdParam = new SqlParameter("@RoleId", roleId);
+
+            // Optional Parameters
+            
 
             try
             {

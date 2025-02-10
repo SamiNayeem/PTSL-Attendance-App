@@ -59,13 +59,13 @@ namespace PTSLAttendanceManager.Controllers
             // Create a list to hold the dynamic response
             var leaveData = leaveTypes.Select(leaveType =>
             {
-                long remaining = leaveType.Type.ToLower() switch
+                float remaining = leaveType.Type.ToLower() switch
                 {
                     "earned" => userLeave.PendingEarnedLeave,
                     "casual" => userLeave.PendingCasualLeave,
                     "sick" => userLeave.PendingSickLeave,
                     "maternity" => userLeave.PendingMaternityLeave,
-                    _ => 0
+                    _ => 0f
                 };
 
                 return new

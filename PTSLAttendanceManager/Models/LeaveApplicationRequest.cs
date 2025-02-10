@@ -7,7 +7,7 @@
         public long LeaveDurationId { get; set; }
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
-        public long TotalDays { get; set; }
+        public float TotalDays { get; set; }
         public string? Reason { get; set; }
         public string? AssignedTo { get; set; }
         public string? AddressDuringLeave { get; set; }

@@ -52,11 +52,17 @@ namespace PTSLAttendanceManager.Controllers
             }
 
             // Check for conflicts with the assigned person’s leave on the specified dates
-            var assignedPersonLeaveConflict = await _context.LeaveApplication
-                .Where(leave => leave.AssignedTo == request.AssignedTo &&
-                                leave.IsActive &&
-                                (leave.FromDate <= request.ToDate && leave.ToDate >= request.FromDate))
-                .AnyAsync();
+
+            var assignedPersonLeaveConflict = false;
+            if (!string.IsNullOrEmpty(request.AssignedTo))
+            {
+                assignedPersonLeaveConflict = await _context.LeaveApplication
+                    .Where(leave => leave.AssignedTo == request.AssignedTo &&
+                                    leave.IsActive &&
+                                    (leave.FromDate <= request.ToDate && leave.ToDate >= request.FromDate))
+                    .AnyAsync();
+            }
+
 
             // Check if the assigned person is the same as the applicant
             if (request.AssignedTo == ptslId)
@@ -246,8 +252,9 @@ namespace PTSLAttendanceManager.Controllers
             });
         }
 
-        private bool DeductLeaveDays(UserWiseLeave userLeave, long leaveTypeId, long totalDays)
+        private bool DeductLeaveDays(UserWiseLeave userLeave, long leaveTypeId, float totalDays)
         {
+            
             switch (leaveTypeId)
             {
                 case 1: // Earned Leave

@@ -9,7 +9,7 @@ namespace PTSLAttendanceManager.Models.Entity
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public required string Type { get; set; }
-        public required long TotalLeaveDays { get; set; }
+        public required float TotalLeaveDays { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

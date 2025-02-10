@@ -18,7 +18,7 @@
         public DateTime ApplyingDate { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-        public long TotalDays { get; set; }
+        public float TotalDays { get; set; }
         public string Reason { get; set; }
         public string LeaveType { get; set; }
         public string LeaveDuration { get; set; }
@@ -29,9 +29,10 @@
         public string? ApprovalPMName { get; set; }
         public DateTime? ApprovedAt { get; set; }
         public bool HRApproval { get; set; }
-        public long PendingSickLeave { get; set; }
-        public long PendingEarnedLeave { get; set; }
-        public long PendingCasualLeave { get; set; }
+        public float PendingSickLeave { get; set; }
+        public float PendingEarnedLeave { get; set; }
+        public float PendingCasualLeave { get; set; }
+        public float PendingLeave { get; set; }
         public string Status { get; set; }
     }
 

@@ -21,7 +21,7 @@ namespace PTSLAttendanceManager.Models.Entity
         public required LeaveType LeaveType { get; set; }
         public required DateOnly FromDate { get; set; }
         public required DateOnly ToDate { get; set; }
-        public required long TotalDays { get; set; }
+        public required float TotalDays { get; set; }
         public string? Reason { get; set; }
         public string? AssignedTo { get; set; }
         public Users? AssignedUser { get; set; }
